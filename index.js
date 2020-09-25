@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', e => {
     let w = canvas.width;
     let nw = imgObj.naturalWidth;
     let nh = imgObj.naturalHeight;
+
+    // we actually DON'T want to force the canvas to be a square anymore
+    // we want it to be a rectangle so we can crop out the sides manually
     let aspect = nw / nh
     let h = w / aspect;
     canvas.height = h;
@@ -31,7 +34,9 @@ document.addEventListener('DOMContentLoaded', e => {
       const ratio = w / nw
       const difference = nw - nh;
       const toCrop = (ratio * difference) / 2;
-      console.log(ratio, difference, toCrop)
+
+      // otherwise the canvas is larger than the image
+      canvas.width = w - (toCrop * 2);
 
       ctx.drawImage(imgObj, -toCrop, 0, w - toCrop, h)
 
