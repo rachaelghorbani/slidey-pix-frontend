@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', e => {
     let w = canvas.width;
     let nw = imgObj.naturalWidth;
     let nh = imgObj.naturalHeight;
-    let h = canvas.height;
+    let aspect = nw / nh
+    let h = w / aspect;
+    canvas.height = h;
+    
 
     if (nh < nw) {
       // let's say nw is 2400
@@ -28,6 +31,7 @@ document.addEventListener('DOMContentLoaded', e => {
       const ratio = w / nw
       const difference = nw - nh;
       const toCrop = (ratio * difference) / 2;
+      console.log(ratio, difference, toCrop)
 
       ctx.drawImage(imgObj, -toCrop, 0, w - toCrop, h)
 

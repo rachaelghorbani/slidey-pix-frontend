@@ -1,3 +1,8 @@
 p {
   color: red;
 }
+
+.center {
+  margin-top: auto;
+  margin-bottom: auto;
+}
