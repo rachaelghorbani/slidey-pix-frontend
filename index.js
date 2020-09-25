@@ -38,15 +38,19 @@ document.addEventListener('DOMContentLoaded', e => {
       // otherwise the canvas is larger than the image
       canvas.width = w - (toCrop * 2);
 
-      ctx.drawImage(imgObj, -toCrop, 0, w - toCrop, h)
+      ctx.drawImage(imgObj, -toCrop, 0, w - toCrop, h);
 
     } else {
-      const difference = h - w;
-      const toCrop = difference / 2;
+      const ratio = h / nh
+      const difference = nh - nw;
+      const toCrop = (ratio * difference) / 2;
+
+      canvas.height = h - (toCrop * 2);
+
+      ctx.drawImage(imgObj, 0, -toCrop, w, h - toCrop);
 
     }
 
-    // ctx.drawImage(imgObj, 0, 0, h, h)
   }
 
 
