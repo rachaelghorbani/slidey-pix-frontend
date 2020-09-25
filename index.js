@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', e => {
             const ctx = canvas.getContext('2d');
 
             // these variables are same deal as above
-            // not sure if we're supposed to have the consts here but it works so whatever
+            // not sure if we're supposed to have the consts here or just use lets above but it works so whatever
             const w = canvas.width;
             const nw = imgObj.naturalWidth;
             const nh = imgObj.naturalHeight;
