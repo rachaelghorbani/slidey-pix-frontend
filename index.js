@@ -219,13 +219,19 @@ document.addEventListener('DOMContentLoaded', e => {
         scramblePuzzleButton.hidden = false;
         const gridContainer = document.querySelector('.grid-container')
         gridContainer.hidden = false
+       
       } else if (e.target.matches('.img-thumbnail')) {
+          
         const imgId = e.target.dataset.imgId;
         const imageGrid = document.querySelector('.grid-container')
         imageGrid.dataset.imgId = imgId
         const leaderboard = document.querySelector('.leaderboard-container')
         renderLeaderboard(imgId);
         leaderboard.hidden = false
+        const scrambleButton = document.querySelector('#scramble')
+       
+            imageGrid.style.pointerEvents = 'none';
+        // }
 
         const userImagesObj = {
           user_id: userId,
@@ -255,6 +261,7 @@ document.addEventListener('DOMContentLoaded', e => {
     gridContainer.hidden = false;
     const scrambleButton = document.querySelector('#scramble')
     scrambleButton.hidden = false
+   
     cropImage(puzzleUrl)
 
   }
@@ -327,12 +334,17 @@ document.addEventListener('DOMContentLoaded', e => {
       let moveablePositions = moveableTilePositions(emptyPosIndex);
 
       if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
+      
         const movesCounter = document.querySelector('#moves-counter')
         movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
         swapTiles(e.target.parentElement);
         isSolved()
+        
       } else if (e.target.matches('#scramble')) {
         const movesCounter = document.querySelector('#moves-container')
+        const imageGrid = document.querySelector('.grid-container')
+       
+        imageGrid.style.pointerEvents = 'auto'
         // movesCounter.hidden = false
         scrambleTiles();
       }
