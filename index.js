@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', e => {
-
+  let userId;
+  const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  }
+  
   const cropImage = () => {
     // take original image and make it square:
 
@@ -108,5 +113,32 @@ document.addEventListener('DOMContentLoaded', e => {
     });
   
   });
+
+  document.addEventListener('submit', e => {
+    e.preventDefault();
+    if(e.target.matches('#login')){
+
+      const username = e.target.username.value
+
+      const userObj = {
+        username: username
+      }
+
+      const options = {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(userObj)
+      }
+
+      fetch('http://localhost:3000/users', options)
+      .then(resp => resp.json())
+      .then(console.log)
+      
+      // .then(user => console.log(user))
+
+    }
+  })
+
+
 });
 
