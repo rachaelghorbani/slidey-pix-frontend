@@ -100,4 +100,13 @@ document.addEventListener('DOMContentLoaded', e => {
 
   // call the function. much DRY very wow lol
   cropImage();
+
+  $(document).ready(function () {
+
+    $('#sidebarCollapse').on('click', function () {
+        $('#sidebar').toggleClass('active');
+    });
+  
+  });
 });
+
