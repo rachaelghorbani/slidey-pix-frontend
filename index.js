@@ -208,6 +208,8 @@ document.addEventListener('DOMContentLoaded', e => {
   
       }
     })
+
+    
   
     document.addEventListener('click', e => {
       if(e.target.matches('#showPuzzle')){
@@ -218,8 +220,12 @@ document.addEventListener('DOMContentLoaded', e => {
         const gridContainer = document.querySelector('.grid-container')
         gridContainer.hidden = false
       } else if (e.target.matches('.img-thumbnail')) {
-        // create a new user_images instance with this user and image
         const imgId = e.target.dataset.imgId;
+        const imageGrid = document.querySelector('.grid-container')
+        imageGrid.dataset.imgId = imgId
+        const leaderboard = document.querySelector('.leaderboard-container')
+        renderLeaderboard(imgId);
+        leaderboard.hidden = false
 
         const userImagesObj = {
           user_id: userId,
@@ -235,26 +241,24 @@ document.addEventListener('DOMContentLoaded', e => {
         fetch('http://localhost:3000/user_images/', options)
         .then(response => response.json())
         .then(json => {
-          renderPuzzle(json.image.img_url);
-
+          renderPuzzle(json.id, json.image.img_url);
         })
-
-        // render the chosen puzzle as a puzzle
       }
     })
   }
 
-  const renderPuzzle = puzzleUrl => {
+  const renderPuzzle = (userImageId, puzzleUrl) => {
     const imageGallery = document.querySelector('.puzzle-container');
     imageGallery.hidden = true;
     const gridContainer = document.querySelector('.grid-container');
+    gridContainer.dataset.userImageId = userImageId
     gridContainer.hidden = false;
     const scrambleButton = document.querySelector('#scramble')
     scrambleButton.hidden = false
     cropImage(puzzleUrl)
 
   }
-  clickHandler();
+
 
   const findEmptyTilePosition = () => {
     return parseInt(document.querySelector('#tile-8').parentElement.id, 10)
@@ -323,14 +327,116 @@ document.addEventListener('DOMContentLoaded', e => {
       let moveablePositions = moveableTilePositions(emptyPosIndex);
 
       if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
-      
+        const movesCounter = document.querySelector('#moves-counter')
+        movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
         swapTiles(e.target.parentElement);
+        isSolved()
       } else if (e.target.matches('#scramble')) {
+        const movesCounter = document.querySelector('#moves-container')
+        // movesCounter.hidden = false
         scrambleTiles();
       }
     });
   };
 
+  const isSolved = () => {
+    const gridItems = document.querySelectorAll('.grid-item')
+    let flag = true;
+    for(let position of gridItems){
+        const tileId = position.firstElementChild.id.charAt(position.firstElementChild.id.length - 1)
+      if(position.id != tileId){
+        flag = false;
+      }
+    }
+    if(flag === true){
+      const userImageId = document.querySelector('.grid-container').dataset.userImageId
+      const moves = parseInt(document.querySelector('#moves-counter').innerText, 10)
+
+      
+      const userImageObj = {
+        moves: moves,
+        completed: true
+      }
+      const options = {
+        method: "PATCH",
+        headers: headers,
+        body: JSON.stringify(userImageObj)
+      }
+
+      fetch(`http://localhost:3000/user_images/${userImageId}`, options)
+      .then(response => response.json())
+      .then(json => endOfGame())
+
+
+    }
+  }
+
+  const endOfGame = () => {
+    const modalBody = document.querySelector(".modal-body");
+    const imgId = document.querySelector('.grid-container').dataset.imgId;
+    
+    fetch('http://localhost:3000/user_images')
+    .then(response => response.json())
+    .then(json => {
+      const results = [];
+      for(let userImage of json){
+        if(userImage.image_id == imgId && userImage.completed == true){
+          results.push({
+            "username": userImage.user.username,
+            "moves": userImage.moves
+          })
+        }
+      }
+      const sortedResults = results.sort(function(a, b) {
+        return (a.moves > b.moves) ? 1 : -1;
+      });
+      const leaderboard = document.querySelector('#modal-tbody')
+      for(let i = 0; i < sortedResults.length; i++){
+        const row = document.createElement('tr')
+        row.innerHTML = `
+          <th scope="row">${i + 1}</th>
+          <td>${sortedResults[i].username}</td>              
+          <td>${sortedResults[i].moves}</td>
+        `
+        leaderboard.append(row)
+      }
+    })
+
+    const modalButton = document.querySelector('#show-modal');
+    modalButton.click();
+  }
+
+  const renderLeaderboard = imgId => {
+    fetch('http://localhost:3000/user_images')
+    .then(response => response.json())
+    .then(json => {
+      const results = [];
+      for(let userImage of json){
+        if(userImage.image_id == imgId && userImage.completed == true){
+          results.push({
+            "username": userImage.user.username,
+            "moves": userImage.moves
+          })
+        }
+      }
+      const sortedResults = results.sort(function(a, b) {
+        return (a.moves > b.moves) ? 1 : -1;
+      });
+      const leaderboard = document.querySelector('#ul-tbody')
+      for(let i = 0; i < sortedResults.length; i++){
+        const row = document.createElement('tr')
+        row.innerHTML = `
+          <th scope="row">${i + 1}</th>
+          <td>${sortedResults[i].username}</td>              
+          <td>${sortedResults[i].moves}</td>
+        `
+        leaderboard.append(row)
+       
+      }
+    })
+  }
+
+  clickHandler();
   moveClickHandler();
 
 });

@@ -15,6 +15,49 @@
   </head>
   <body>
 
+  <button id="show-modal" hidden="true" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Launch demo modal
+  </button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" show="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Congratulations, you solved the puzzle!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="modal-leaderboard-container">
+          <h3 class="center">Leaderboard</h3>
+          <table class="table">
+            <thead>
+              <tr>
+               <th scope="col">Rank</th>
+               <th scope = "col">Username</th>
+               <th scope = "col">Moves</th>
+              </th>
+              </tr>
+            </thead>
+            <tbody id="modal-tbody">
+              <!-- <tr>
+                <th scope="row">1</th>
+                <td>box 1</td>              
+                <td>box 2</td>
+              </tr> -->
+            </tbody>
+          </table>       
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+       </div>
+    </div>
+  </div>
+</div>
+
     <div class="wrapper">
       <nav id="sidebar">
         <div class="sidebar-header">
@@ -61,6 +104,26 @@
             <a href="#">Contact</a>
           </li>
         </ul>
+        <div class="leaderboard-container" hidden="true">
+          <h3 class="center">Leaderboard</h3>
+          <table class="table">
+            <thead>
+              <tr>
+               <th scope="col">Rank</th>
+               <th scope = "col">Username</th>
+               <th scope = "col">Moves</th>
+              </th>
+              </tr>
+            </thead>
+            <tbody id="ul-tbody">
+              <!-- <tr>
+                <th scope="row">1</th>
+                <td>box 1</td>              
+                <td>box 2</td>
+              </tr> -->
+            </tbody>
+          </table>       
+        </div>
       </nav>
       <div id="content">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -73,6 +136,7 @@
         </nav>
 
         <button id="scramble" hidden=true>Scramble!</button>
+        <p id="moves-container" >Moves: <span id="moves-counter">0</span></p>
 
         <form id="login">
           <label for="username">Username:</label>        
@@ -93,13 +157,13 @@
 
         <div class="grid-container" hidden="true" >
           <div class="grid-item" id="0"><div class="tile" id="tile-0"></div></div>
-          <div class="grid-item" id="1"><div class="tile" id="tile-3"></div></div>
-          <div class="grid-item" id="2"><div class="tile" id="tile-6"></div></div>
-          <div class="grid-item" id="3"><div class="tile" id="tile-1"></div></div>
+          <div class="grid-item" id="3"><div class="tile" id="tile-3"></div></div>
+          <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
+          <div class="grid-item" id="1"><div class="tile" id="tile-1"></div></div>
           <div class="grid-item" id="4"><div class="tile" id="tile-4"></div></div>
-          <div class="grid-item" id="5"><div class="tile" id="tile-7"></div></div>
-          <div class="grid-item" id="6"><div class="tile" id="tile-2"></div></div>
-          <div class="grid-item" id="7"><div class="tile" id="tile-5"></div></div>
+          <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
+          <div class="grid-item" id="2"><div class="tile" id="tile-2"></div></div>
+          <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
           <div class="grid-item" id="8"><div class="tile" id="tile-8"></div></div>
         </div> 
       </div>
