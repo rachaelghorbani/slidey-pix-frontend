@@ -114,31 +114,51 @@ document.addEventListener('DOMContentLoaded', e => {
   
   });
 
-  document.addEventListener('submit', e => {
-    e.preventDefault();
-    if(e.target.matches('#login')){
+  
+  const login = (user) => {
+    userId = user.id;
+    showPuzzleOptions();
+  };
 
-      const username = e.target.username.value
+  const showPuzzleOptions = () => {
+    const form = document.querySelector('#login')
+    form.hidden = true
+    const showPuzzleButton = document.querySelector('#showPuzzle')
+    showPuzzleButton.hidden = false
+  };
 
-      const userObj = {
-        username: username
+  const clickHandler = () => {
+    document.addEventListener('submit', e => {
+      e.preventDefault();
+      if(e.target.matches('#login')){
+  
+        const username = e.target.username.value
+  
+        const userObj = {
+          username: username
+        }
+  
+        const options = {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(userObj)
+        }
+  
+        fetch('http://localhost:3000/users', options)
+        .then(resp => resp.json())
+        .then(json => login(json))
+  
       }
-
-      const options = {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(userObj)
+    })
+  
+    document.addEventListener('click', e => {
+      if(e.target.matches('#showPuzzle')){
+        const gridContainer = document.querySelector('.grid-container')
+        gridContainer.hidden = false
       }
-
-      fetch('http://localhost:3000/users', options)
-      .then(resp => resp.json())
-      .then(console.log)
-      
-      // .then(user => console.log(user))
-
-    }
-  })
-
+    })
+  }
+  clickHandler();
 
 });
 
