@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', e => {
     "Accept": "application/json"
   }
   
-  const cropImage = () => {
+  const cropImage = (imgUrl) => {
     // take original image and make it square:
 
     // create a temp canvas for the square image
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', e => {
     // create the Image object we'll be using the canvas methods on
     const sqrImgObj = new Image();
     sqrImgObj.crossOrigin = "anonymous";
-    sqrImgObj.src = 'https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format';
+    sqrImgObj.src = imgUrl;
 
     // once the square Image is loaded
     sqrImgObj.onload = function () {
@@ -80,31 +80,23 @@ document.addEventListener('DOMContentLoaded', e => {
             const heightOfOnePiece = nh / 3;
             const widthOfOnePiece = heightOfOnePiece;
 
-            // since this is a 3x3 grid we need different params for each column
-            // for a larger grid we would only need separate params for the first and last columns
-            if (x === 0) {
-              ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, h, h);
-            } else if (x === 1) {
-              ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, h, h);
-            } else if (x === 2) {
-              ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, h, h);
-            }
+            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, h, h);
 
             // every new canvas gets pushed to the imagePieces array as a new element
             imagePieces.push(canvas.toDataURL());
             
             // find the next tile and stick the image in
             const tile = document.querySelector(`#tile-${i}`);
-            tile.innerHTML = `${i}<img src='${imagePieces[i]}'>`;
+            tile.innerHTML = `<img src='${imagePieces[i]}'>`;
             i++;
           }
         }
+        const emptyTile = document.querySelector(`#tile-8`);
+        emptyTile.innerHTML = '';
       }
     }
   }
 
-  // call the function. much DRY very wow lol
-  cropImage();
 
   $(document).ready(function () {
 
@@ -117,14 +109,80 @@ document.addEventListener('DOMContentLoaded', e => {
   
   const login = (user) => {
     userId = user.id;
-    showPuzzleOptions();
-  };
-
-  const showPuzzleOptions = () => {
     const form = document.querySelector('#login')
     form.hidden = true
-    const showPuzzleButton = document.querySelector('#showPuzzle')
-    showPuzzleButton.hidden = false
+    getImages();
+  };
+
+  const getImages = () => {
+    fetch('http://localhost:3000/images')
+      .then(resp => resp.json())
+      .then(json => renderImages(json))
+  };
+
+  const renderImages = (images) => {
+    document.querySelector('.puzzle-container').hidden = false;
+    for (let image of images) {
+      renderImage(image);
+    }
+  };
+
+  const renderImage = (image) => {
+    let flag = false;
+    for (let user of image.users) {
+      if (user.id === userId) {
+        // flag = true
+      }
+    }
+    if (flag === false) {
+      squareImg(image.id, image.img_url);
+    }
+  }
+
+  const squareImg = (id, img_url) => {
+    const origCanvas = document.createElement('canvas');
+    const origCtx = origCanvas.getContext('2d');
+
+    // create the Image object we'll be using the canvas methods on
+    const sqrImgObj = new Image();
+    sqrImgObj.crossOrigin = "anonymous";
+    sqrImgObj.src = img_url;
+
+    // once the square Image is loaded
+    sqrImgObj.onload = function () {
+
+      // desired width to base square off of
+      const h = 800;
+
+      // original image width and height so we can figure out the aspect ratio
+      const nw = sqrImgObj.naturalWidth;
+      const nh = sqrImgObj.naturalHeight;
+      const aspect = nw / nh;
+      const w = h * aspect;
+
+      // now we can assign the height to the canvas (shorter side)
+      origCanvas.height = h;
+
+      // ratio helps us figure out how much to crop at various points
+      const ratio = w / nw
+      const difference = nw - nh;
+      const origToCrop = (ratio * difference) / 2;
+      origCanvas.width = w - (origToCrop * 2);
+
+      // draw image with params: imgobj, sx, sy, swidth, sheight
+      origCtx.drawImage(sqrImgObj, -origToCrop, 0, w - origToCrop, h);
+
+      const newDiv = document.createElement('div');
+      newDiv.class = "col-lg-3 col-md-4 col-6";
+
+      newDiv.innerHTML = `
+        <a href="#" class="d-block mb-4 h-100">
+          <img class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
+        </a>
+      `;
+
+      document.querySelector('#thumbnails').append(newDiv);
+    }
   };
 
   const clickHandler = () => {
@@ -153,12 +211,127 @@ document.addEventListener('DOMContentLoaded', e => {
   
     document.addEventListener('click', e => {
       if(e.target.matches('#showPuzzle')){
+        const showPuzzleButton = document.querySelector('#showPuzzle')
+        showPuzzleButton.hidden = true
+        const scramblePuzzleButton = document.querySelector('#scramble');
+        scramblePuzzleButton.hidden = false;
         const gridContainer = document.querySelector('.grid-container')
         gridContainer.hidden = false
+      } else if (e.target.matches('.img-thumbnail')) {
+        // create a new user_images instance with this user and image
+        const imgId = e.target.dataset.imgId;
+
+        const userImagesObj = {
+          user_id: userId,
+          image_id: imgId
+        }
+
+        const options = {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(userImagesObj)
+        }
+        
+        fetch('http://localhost:3000/user_images/', options)
+        .then(response => response.json())
+        .then(json => {
+          renderPuzzle(json.image.img_url);
+
+        })
+
+        // render the chosen puzzle as a puzzle
       }
     })
   }
+
+  const renderPuzzle = puzzleUrl => {
+    const imageGallery = document.querySelector('.puzzle-container');
+    imageGallery.hidden = true;
+    const gridContainer = document.querySelector('.grid-container');
+    gridContainer.hidden = false;
+    const scrambleButton = document.querySelector('#scramble')
+    scrambleButton.hidden = false
+    cropImage(puzzleUrl)
+
+  }
   clickHandler();
+
+  const findEmptyTilePosition = () => {
+    return parseInt(document.querySelector('#tile-8').parentElement.id, 10)
+  };
+
+  const moveableTilePositions = (emptyPosIndex) => {
+    // this is a 3x3 grid. should be fairly easy to manually dictate which tiles you can move based on emptyPosIndex.
+    // to generalize this to any grid, we would need to find the corners
+    // and each side. set different rules for each category: corner, each side, middle
+    // not worth it for a grid of 9, but for a grid of 25 for example we could totally do it
+    switch(emptyPosIndex) {
+      case 0:
+        return [1, 3];
+      case 1:
+        return [0, 2, 4];
+      case 2:
+        return [1, 5];
+      case 3:
+        return [0, 4, 6];
+      case 4:
+        return [1, 3, 5, 7];
+      case 5:
+        return [2, 4, 8];
+      case 6:
+        return [3, 7];
+      case 7:
+        return [4, 6, 8];
+      case 8:
+        return [5, 7];
+    }
+  };
+
+  const swapTiles = (tileToMove) => {
+    let posToPlace = tileToMove.parentElement;
+
+    let emptyPosIndex = findEmptyTilePosition();
+
+    let emptyTile = document.getElementById(`${emptyPosIndex}`).firstChild;
+
+    document.getElementById(`${emptyPosIndex}`).firstChild.remove();
+
+    document.getElementById(`${emptyPosIndex}`).append(tileToMove);
+
+    posToPlace.append(emptyTile);
+  };
+
+  const scrambleTiles = () => {
+    for (let i = 0; i < 100; i++) {
+      
+      let emptyPosIndex = findEmptyTilePosition();
+
+      let moveablePositions = moveableTilePositions(emptyPosIndex);
+
+      let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
+
+      let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
+
+      swapTiles(tileToMove)
+    }
+  };
+
+  const moveClickHandler = () => {
+    document.addEventListener('click', e => {
+      let emptyPosIndex = findEmptyTilePosition();
+
+      let moveablePositions = moveableTilePositions(emptyPosIndex);
+
+      if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
+      
+        swapTiles(e.target.parentElement);
+      } else if (e.target.matches('#scramble')) {
+        scrambleTiles();
+      }
+    });
+  };
+
+  moveClickHandler();
 
 });
 

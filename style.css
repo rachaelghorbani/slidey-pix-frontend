@@ -3,13 +3,6 @@
   width: 100%;
   align-items: stretch;
 }
-
-#sidebar {
-  min-width: 250px;
-  max-width: 250px;
-  min-height: 100vh;
-}
-
 #sidebar.active {
   margin-left: -250px;
 }
@@ -58,6 +51,10 @@ a, a:hover, a:focus {
 }
 
 #sidebar {
+    
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
     /* don't forget to add all the previously mentioned styles here too */
     background: #7386D5;
     color: #fff;
@@ -108,14 +105,20 @@ ul ul a {
 .grid-container {
   display: grid;
   grid-template-columns: auto auto auto;
-  background-color: #2196F3;
   padding: 10px;
 }
 
 .grid-item {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.8);
-  padding: 20px;
   font-size: 30px;
   text-align: center;
+}
+
+.img-thumbnail {
+  height: 300px;
+}
+
+#content {
+  padding-left: 20px;
 }
