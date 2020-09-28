@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', e => {
             const heightOfOnePiece = nh / 3;
             const widthOfOnePiece = heightOfOnePiece;
 
-            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, h, h);
+            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
 
             // every new canvas gets pushed to the imagePieces array as a new element
             imagePieces.push(canvas.toDataURL());
@@ -88,6 +88,8 @@ document.addEventListener('DOMContentLoaded', e => {
             // find the next tile and stick the image in
             const tile = document.querySelector(`#tile-${i}`);
             tile.innerHTML = `<img src='${imagePieces[i]}'>`;
+           
+            
             i++;
           }
         }

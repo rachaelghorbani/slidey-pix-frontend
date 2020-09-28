@@ -104,8 +104,10 @@ ul ul a {
 
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 200px 200px 200px;
+  grid-template-rows: 200px 200px 200px;
   padding: 10px;
+  
 }
 
 .grid-item {
@@ -122,3 +124,4 @@ ul ul a {
 #content {
   padding-left: 20px;
 }
+
