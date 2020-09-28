@@ -67,18 +67,24 @@ document.addEventListener('DOMContentLoaded', e => {
 
             // these variables are same deal as above
             // not sure if we're supposed to have the consts here or just use lets above but it works so whatever
-            const w = canvas.width;
-            const nw = imgObj.naturalWidth;
+            // const w = canvas.width;
+            // const nw = imgObj.naturalWidth;
             const nh = imgObj.naturalHeight;
-            const aspect = nw / nh
-            const h = w / aspect;
-            canvas.height = h;
-            const ratio = w / nw;
-            const difference = nw - nh;
-            const toCrop = (ratio * difference) / 2;
-            canvas.width = w - (toCrop * 2)
+            
+            // const aspect = nw / nh
+            // const h = w / aspect;
+
+            //height of the canvas we want
+            canvas.height = 198;
+            // const ratio = w / nw;
+            
+            // const difference = nw - nh;
+            // const toCrop = (ratio * difference) / 2;
+            // canvas.width = w - (toCrop * 2)
             const heightOfOnePiece = nh / 3;
             const widthOfOnePiece = heightOfOnePiece;
+
+            // ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
 
             ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
 
