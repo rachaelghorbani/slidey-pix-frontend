@@ -416,6 +416,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
     const modalButton = document.querySelector('#show-modal');
     modalButton.click();
+    const imageGrid = document.querySelector('.grid-container')
+    imageGrid.style.pointerEvents = 'none'
   }
 
   const renderLeaderboard = imgId => {
