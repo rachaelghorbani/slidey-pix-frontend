@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', e => {
             i++;
           }
         }
-        debugger
+        
         
         const emptyTile = document.querySelector(`#tile-15`);
         emptyTile.innerHTML = '';
@@ -231,37 +231,40 @@ document.addEventListener('DOMContentLoaded', e => {
         gridContainer.hidden = false
        
       } else if (e.target.matches('.img-thumbnail')) {
-          
-        const imgId = e.target.dataset.imgId;
-        const imageGrid = document.querySelector('.grid-container')
-        imageGrid.dataset.imgId = imgId
-        const leaderboard = document.querySelector('.leaderboard-container')
-        renderLeaderboard(imgId);
-        leaderboard.hidden = false
-        const scrambleButton = document.querySelector('#scramble')
-       
-            imageGrid.style.pointerEvents = 'none';
-        // }
-
-        const userImagesObj = {
-          user_id: userId,
-          image_id: imgId
-        }
-
-        const options = {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(userImagesObj)
-        }
-        
-        fetch('http://localhost:3000/user_images/', options)
-        .then(response => response.json())
-        .then(json => {
-          renderPuzzle(json.id, json.image.img_url);
-        })
+        renderSelectedImageAsPuzzle(e.target)
       }
     })
   }
+
+  const renderSelectedImageAsPuzzle = el => {
+    const imgId = el.dataset.imgId;
+    const imageGrid = document.querySelector('.grid-container')
+    imageGrid.dataset.imgId = imgId
+    const leaderboard = document.querySelector('.leaderboard-container')
+    renderLeaderboard(imgId);
+    leaderboard.hidden = false
+   
+        // imageGrid.style.pointerEvents = 'none';
+    // }
+
+    const userImagesObj = {
+      user_id: userId,
+      image_id: imgId
+    }
+
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(userImagesObj)
+    }
+    
+    fetch('http://localhost:3000/user_images/', options)
+    .then(response => response.json())
+    .then(json => {
+      renderPuzzle(json.id, json.image.img_url);
+    })
+  }
+
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const imageGallery = document.querySelector('.puzzle-container');
@@ -402,10 +405,18 @@ document.addEventListener('DOMContentLoaded', e => {
     const gridItems = document.querySelectorAll('.grid-item')
     let flag = true;
     for(let position of gridItems){
-        const tileId = position.firstElementChild.id.charAt(position.firstElementChild.id.length - 1)
-      if(position.id != tileId){
+        const tileIdLengthToGet = position.firstElementChild.id.length + 5 
+        const tileId = position.firstElementChild.id.slice(5, `${tileIdLengthToGet}`)
+        
+        // if(position.firstElementChild.id.length === 6)
+        // const tileId = position.firstElementChild.id.charAt(position.firstElementChild.id.length - 1)
+        // console.log(position.firstElementChild.id)
+       
+      if(position.id !== tileId){
         flag = false;
+        // debugger
       }
+    //   console.log("position id:", position.id, "tileId:", tileId)
     }
     if(flag === true){
       const userImageId = document.querySelector('.grid-container').dataset.userImageId
@@ -428,6 +439,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
 
     }
+    
   }
 
   const endOfGame = () => {
