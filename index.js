@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
         // nested loops go through the cells of the grid we're chopping into
         // starts at top left, moves down the column, then to the next column etc
-        for (let x = 0; x < 3; ++x) {
-          for (let y = 0; y < 3; ++y) {
+        for (let x = 0; x < 4; ++x) {
+          for (let y = 0; y < 4; ++y) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', e => {
             // const difference = nw - nh;
             // const toCrop = (ratio * difference) / 2;
             // canvas.width = w - (toCrop * 2)
-            const heightOfOnePiece = nh / 3;
+            const heightOfOnePiece = nh / 4;
             const widthOfOnePiece = heightOfOnePiece;
 
             // ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
@@ -99,7 +99,9 @@ document.addEventListener('DOMContentLoaded', e => {
             i++;
           }
         }
-        const emptyTile = document.querySelector(`#tile-8`);
+        debugger
+        
+        const emptyTile = document.querySelector(`#tile-15`);
         emptyTile.innerHTML = '';
       }
     }
@@ -276,7 +278,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
 
   const findEmptyTilePosition = () => {
-    return parseInt(document.querySelector('#tile-8').parentElement.id, 10)
+    return parseInt(document.querySelector('#tile-15').parentElement.id, 10)
   };
 
   const moveableTilePositions = (emptyPosIndex) => {
@@ -284,26 +286,63 @@ document.addEventListener('DOMContentLoaded', e => {
     // to generalize this to any grid, we would need to find the corners
     // and each side. set different rules for each category: corner, each side, middle
     // not worth it for a grid of 9, but for a grid of 25 for example we could totally do it
+
+
+    // switch(emptyPosIndex) {
+    //   case 0:
+    //     return [1, 3];
+    //   case 1:
+    //     return [0, 2, 4];
+    //   case 2:
+    //     return [1, 5];
+    //   case 3:
+    //     return [0, 4, 6];
+    //   case 4:
+    //     return [1, 3, 5, 7];
+    //   case 5:
+    //     return [2, 4, 8];
+    //   case 6:
+    //     return [3, 7];
+    //   case 7:
+    //     return [4, 6, 8];
+    //   case 8:
+    //     return [5, 7];
+    // }
+
     switch(emptyPosIndex) {
-      case 0:
-        return [1, 3];
-      case 1:
-        return [0, 2, 4];
-      case 2:
-        return [1, 5];
-      case 3:
-        return [0, 4, 6];
-      case 4:
-        return [1, 3, 5, 7];
-      case 5:
-        return [2, 4, 8];
-      case 6:
-        return [3, 7];
-      case 7:
-        return [4, 6, 8];
-      case 8:
-        return [5, 7];
-    }
+        case 0:
+          return [1, 4];
+        case 1:
+          return [0, 2, 5];
+        case 2:
+          return [1, 3, 6];
+        case 3:
+          return [2, 7];
+        case 4:
+          return [0, 5, 8];
+        case 5:
+          return [1, 4, 6, 9];
+        case 6:
+          return [2, 5, 7, 10];
+        case 7:
+          return [3, 6, 11];
+        case 8:
+          return [4, 9, 12];
+        case 9:
+          return [5, 8, 10, 12];
+        case 10:
+          return [6, 9, 11, 14];
+        case 11:
+          return [7, 10, 15];
+        case 12:
+          return [8, 13];
+        case 13:
+          return [9, 12, 14];
+        case 14:
+          return [10, 12, 15];
+        case 15:
+          return [11, 14];
+      }
   };
 
   const swapTiles = (tileToMove) => {
