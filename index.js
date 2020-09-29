@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', e => {
   let userId;
   const headers = {
     "Content-Type": "application/json",
-    "Accept": "application/json"
+    "Accept": "application/json",
   }
 
   const squareImg = (id, img_url, moves) => {
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', e => {
         const h = 800;
 
         // original image width and height so we can figure out the aspect ratio
-        
+
         const aspect = nw / nh;
         const w = h * aspect;
 
@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const cropImage = (imgUrl) => {
+    
     // take original image and make it square:
 
     // create a temp canvas for the square image
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
     // once the square Image is loaded
     sqrImgObj.onload = function () {
-      
+
       const nw = sqrImgObj.naturalWidth;
       const nh = sqrImgObj.naturalHeight;
 
@@ -109,8 +110,6 @@ document.addEventListener('DOMContentLoaded', e => {
         const difference = nw - nh;
         const origToCrop = (ratio * difference) / 2;
         origCanvas.width = w - (origToCrop * 2);
-        
-        console.log(w, h, origCanvas.width, origCanvas.height, origToCrop)
 
         // draw image with params: imgobj, sx, sy, swidth, sheight
         origCtx.drawImage(sqrImgObj, -origToCrop, 0, w - origToCrop, h);
@@ -126,7 +125,6 @@ document.addEventListener('DOMContentLoaded', e => {
         const difference = nh - nw;
         const origToCrop = (ratio * difference) / 2;
         origCanvas.height = h - (origToCrop * 2);
-        console.log(w, h, origCanvas.width, origCanvas.height, origToCrop)
 
         origCtx.drawImage(sqrImgObj, 0, -origToCrop, w, h - origToCrop);
       }
@@ -224,6 +222,7 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const clearContent = () => {
+    document.querySelector('.leaderboard-container').hidden = true;
     while (contentDiv.childNodes[2]) {
       contentDiv.childNodes[2].remove();
     }
@@ -235,7 +234,7 @@ document.addEventListener('DOMContentLoaded', e => {
     }
   };
 
-  const getImages = () => {
+  const getImages = (category) => {
     clearContent();
 
     const galleryContainer = document.createElement('div');
@@ -260,13 +259,21 @@ document.addEventListener('DOMContentLoaded', e => {
 
     fetch('http://localhost:3000/images')
       .then(resp => resp.json())
-      .then(json => renderImages(json))
+      .then(json => renderImages(json, category))
   };
 
-  const renderImages = (images) => {
+  const renderImages = (images, category) => {
     for (let image of images) {
       if (image.owner === null || image.owner.id === userId) {
-        renderImage(image);
+        if (typeof category !== 'undefined') {
+          if (image.category.name === category.toLowerCase()) {
+            renderImage(image);
+            // return;
+          }
+        } else {
+          renderImage(image);
+          // return;
+        }
       }
     }
   };
@@ -304,28 +311,38 @@ document.addEventListener('DOMContentLoaded', e => {
           .then(resp => resp.json())
           .then(json => login(json))
 
-      } else if(e.target.matches('#add-image')){
+      } else if (e.target.matches('#add-image')) {
         clearContent()
-        const form = e.target
+        fetch('http://localhost:3000/categories')
+          .then(resp => resp.json())
+          .then(json => {
+            let categoryId;
+            for (let category of json) {
+              if (category.name === "my custom puzzles") {
+                categoryId = category.id;
+              }
+            }
+            const form = e.target
 
-        const imgObj = {
-          img_url: form.img_url.value,
-          user_id: userId
-        }
+            const imgObj = {
+              img_url: form.img_url.value,
+              user_id: userId,
+              category_id: categoryId
+            }
 
-        const options = {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(imgObj)
-        }
+            const options = {
+              method: "POST",
+              headers: headers,
+              body: JSON.stringify(imgObj)
+            }
 
-        fetch("http://localhost:3000/images", options)
-        .then(response => response.json())
-        .then(json => {
-          addPuzzleGrid();
-          renderSelectedImageAsPuzzle(json.id)
-        })
-
+            fetch("http://localhost:3000/images", options)
+              .then(response => response.json())
+              .then(json => {
+                addPuzzleGrid();
+                renderSelectedImageAsPuzzle(json.id)
+              })
+          })
       }
     })
 
@@ -433,8 +450,8 @@ document.addEventListener('DOMContentLoaded', e => {
         const submitButton = document.createElement('button')
         submitButton.textContent = "Create Puzzle!"
         submitButton.type = 'submit'
-        
-        
+
+
         const imgInput = document.createElement('input')
         imgInput.className = "form-control"
         imgInput.type = "text"
@@ -445,8 +462,8 @@ document.addEventListener('DOMContentLoaded', e => {
         form.append(formDiv)
         form.append(submitButton)
         contentDiv.append(form)
-      } else if(e.target.matches('.logout')){
-                
+      } else if (e.target.matches('.logout')) {
+
         userId = ''
         clearContent()
         const toHide = document.querySelectorAll('.hide-until-login')
@@ -465,8 +482,13 @@ document.addEventListener('DOMContentLoaded', e => {
           </form>
         `
         contentDiv.append(formDiv)
+      } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
+        resetActiveNavBarElement(e.target)
+        getImages(e.target.textContent)
       }
     })
+
+
 
     $('#exampleModal').on('hide.bs.modal', e => {
       const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
@@ -485,7 +507,7 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
   const renderSelectedImageAsPuzzle = imgId => {
-    
+
     const imageGrid = document.querySelector('.grid-container')
     imageGrid.dataset.imgId = imgId
     const leaderboard = document.querySelector('.leaderboard-container')
