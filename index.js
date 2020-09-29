@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', e => {
+  const contentDiv = document.querySelector('#content');
   let userId;
   const headers = {
     "Content-Type": "application/json",
     "Accept": "application/json"
   }
   
-  const squareImg = (id, img_url) => {
+  const squareImg = (id, img_url, moves) => {
     const origCanvas = document.createElement('canvas');
     const origCtx = origCanvas.getContext('2d');
 
@@ -48,6 +49,12 @@ document.addEventListener('DOMContentLoaded', e => {
       `;
 
       document.querySelector('#thumbnails').append(newDiv);
+      if (document.querySelector('.solved-container')) {
+        const thumbDiv = document.querySelector('#thumbnails').lastElementChild;
+        const movesP = document.createElement('p');
+        movesP.textContent = `Completed in ${moves} moves!`;
+        thumbDiv.firstElementChild.append(movesP);
+      }
     }
   };
 
@@ -143,11 +150,40 @@ document.addEventListener('DOMContentLoaded', e => {
             i++;
           }
         }
+        
         const emptyTile = document.querySelector(`#tile-15`);
         emptyTile.innerHTML = '';    
       }
     }
   } 
+
+  const addPuzzleGrid = () => {
+    clearContent();
+    const newDiv = document.createElement('div');
+    newDiv.className = 'grid-container';
+    newDiv.innerHTML = `
+      <div class="grid-item" id="0"><div class="tile" id="tile-0"></div></div>
+      <div class="grid-item" id="4"><div class="tile" id="tile-4"></div></div>
+      <div class="grid-item" id="8"><div class="tile" id="tile-8"></div></div>
+      <div class="grid-item" id="12"><div class="tile" id="tile-12"></div></div>
+
+      <div class="grid-item" id="1"><div class="tile" id="tile-1"></div></div>
+      <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
+      <div class="grid-item" id="9"><div class="tile" id="tile-9"></div></div>
+      <div class="grid-item" id="13"><div class="tile" id="tile-13"></div></div>
+
+      <div class="grid-item" id="2"><div class="tile" id="tile-2"></div></div>
+      <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
+      <div class="grid-item" id="10"><div class="tile" id="tile-10"></div></div>
+      <div class="grid-item" id="14"><div class="tile" id="tile-14"></div></div>
+
+      <div class="grid-item" id="3"><div class="tile" id="tile-3"></div></div>
+      <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
+      <div class="grid-item" id="11"><div class="tile" id="tile-11"></div></div>
+      <div class="grid-item" id="15"><div class="tile" id="tile-15"></div></div>
+    `;
+    contentDiv.append(newDiv)
+  };
 
   $(document).ready(function () {
     $('#sidebarCollapse').on('click', function () {
@@ -168,20 +204,47 @@ document.addEventListener('DOMContentLoaded', e => {
     getImages();
   };
 
-  const getImages = () => {
-    const puzzleContainer = document.querySelector('#thumbnails')
-    while(puzzleContainer.firstElementChild){
-        puzzleContainer.firstElementChild.remove()
+  const clearContent = () => {
+    while (contentDiv.childNodes[2]) {
+      contentDiv.childNodes[2].remove();
     }
-    const solvedPuzzles = document.querySelector('#user-solved-puzzle-container')
-    solvedPuzzles.hidden = true
+  }
+
+  const removeChildren = parent => {
+    while (parent.firstElementChild) {
+      parent.firstElementChild.remove();
+    }
+  };
+
+  const getImages = () => {
+    clearContent();
+
+    const galleryContainer = document.createElement('div');
+    galleryContainer.className = "gallery-container";
+
+    const galleryHead = document.createElement('h1');
+    galleryHead.className = "font-weight-light text-center text-lg-left mt-4 mb-0";
+    galleryHead.textContent = "Puzzle Gallery";
+
+    const galleryHr = document.createElement('hr');
+    galleryHr.className = "mt-2 mb-5";
+
+    const thumbnailDiv = document.createElement('div');
+    thumbnailDiv.className = "row text-center text-lg-left";
+    thumbnailDiv.id = "thumbnails";
+
+    galleryContainer.append(galleryHead);
+    galleryContainer.append(galleryHr);
+    galleryContainer.append(thumbnailDiv);
+
+    contentDiv.append(galleryContainer);
+
     fetch('http://localhost:3000/images')
       .then(resp => resp.json())
       .then(json => renderImages(json))
   };
 
   const renderImages = (images) => {
-    document.querySelector('.puzzle-container').hidden = false;
     for (let image of images) {
       renderImage(image);
     }
@@ -224,8 +287,8 @@ document.addEventListener('DOMContentLoaded', e => {
     })
   
     document.addEventListener('click', e => {
-        let emptyPosIndex = findEmptyTilePosition();
-        let moveablePositions = moveableTilePositions(emptyPosIndex);
+
+      
       if(e.target.matches('#showPuzzle')){
         const showPuzzleButton = document.querySelector('#showPuzzle')
         showPuzzleButton.hidden = true
@@ -235,9 +298,32 @@ document.addEventListener('DOMContentLoaded', e => {
         gridContainer.hidden = false
        
       } else if (e.target.matches('.img-thumbnail')) {
+        addPuzzleGrid();
+        console.log(e.target)
         renderSelectedImageAsPuzzle(e.target)
       } else if (e.target.matches('.completed-puzzles')){
-            clickAwayFromPuzzle()
+          clearContent();
+          const solvedContainer = document.createElement('div');
+          solvedContainer.className = "solved-container";
+          solvedContainer.id = "user-solved-puzzle-container";
+
+          const galleryHead = document.createElement('h1');
+          galleryHead.className = "font-weight-light text-center text-lg-left mt-4 mb-0";
+          galleryHead.textContent = "Completed Puzzles";
+
+          const galleryHr = document.createElement('hr');
+          galleryHr.className = "mt-2 mb-5";
+
+          const thumbnailDiv = document.createElement('div');
+          thumbnailDiv.className = "row text-center text-lg-left";
+          thumbnailDiv.id = "thumbnails";
+
+          solvedContainer.append(galleryHead);
+          solvedContainer.append(galleryHr);
+          solvedContainer.append(thumbnailDiv);
+
+          contentDiv.append(solvedContainer);
+
           resetActiveNavBarElement(e.target)
           const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container')
           userCompletedPuzzles.hidden = false
@@ -265,18 +351,24 @@ document.addEventListener('DOMContentLoaded', e => {
                     }
                 }
             }
-            console.log(solvedPuzzles)
-            // run crop object on both imgage urls from solvedPuzzles 
+            for (let puzzle of solvedPuzzles) {
+              squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves)
+            }
           })
           
       } else if (e.target.matches('.puzzle-gallery')){
         resetActiveNavBarElement(e.target)
         getImages();
-      } else if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {     
-        const movesCounter = document.querySelector('#moves-counter')
-        movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
-        swapTiles(e.target.parentElement);
-        isSolved()
+      } else if (document.querySelector('.grid-container')) {
+          let emptyPosIndex = findEmptyTilePosition();
+          let moveablePositions = moveableTilePositions(emptyPosIndex);
+    
+          if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {     
+            const movesCounter = document.querySelector('#moves-counter')
+            movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
+            swapTiles(e.target.parentElement);
+            isSolved()
+          }
       } else if (e.target.matches('#scramble')) {
         const movesCounter = document.querySelector('#moves-container')
         const imageGrid = document.querySelector('.grid-container')
@@ -329,28 +421,17 @@ document.addEventListener('DOMContentLoaded', e => {
     })
   }
 
-  const clickAwayFromPuzzle = () => {
-    const gridContainer = document.querySelector('.grid-container')
-    gridContainer.hidden = true
-    const puzzleGallery = document.querySelector('.puzzle-container')
-    puzzleGallery.hidden = true
-    const movesContainer = document.querySelector('#moves-container')
-    movesContainer.hidden = true
-    const scrambleButton = document.querySelector('#scramble');
-    scrambleButton.hidden = true;
-  }
-
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
-    const imageGallery = document.querySelector('.puzzle-container');
-    imageGallery.hidden = true;
-    const movesContainer = document.querySelector('#moves-container')
-    movesContainer.hidden = false
+    const newDiv = document.createElement('div');
+    newDiv.innerHTML = `
+      <button id="scramble">Scramble!</button>
+      <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
+    `;
     const gridContainer = document.querySelector('.grid-container');
+
+    contentDiv.insertBefore(newDiv, gridContainer);
     gridContainer.dataset.userImageId = userImageId;
-    gridContainer.hidden = false;
-    const scrambleButton = document.querySelector('#scramble');
-    scrambleButton.hidden = false;
    
     cropImage(puzzleUrl)
   };
