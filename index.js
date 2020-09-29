@@ -5,6 +5,52 @@ document.addEventListener('DOMContentLoaded', e => {
     "Accept": "application/json"
   }
   
+  const squareImg = (id, img_url) => {
+    const origCanvas = document.createElement('canvas');
+    const origCtx = origCanvas.getContext('2d');
+
+    // create the Image object we'll be using the canvas methods on
+    const sqrImgObj = new Image();
+    sqrImgObj.crossOrigin = "anonymous";
+    sqrImgObj.src = img_url;
+
+    // once the square Image is loaded
+    sqrImgObj.onload = function () {
+
+      // desired width to base square off of
+      const h = 800;
+
+      // original image width and height so we can figure out the aspect ratio
+      const nw = sqrImgObj.naturalWidth;
+      const nh = sqrImgObj.naturalHeight;
+      const aspect = nw / nh;
+      const w = h * aspect;
+
+      // now we can assign the height to the canvas (shorter side)
+      origCanvas.height = h;
+
+      // ratio helps us figure out how much to crop at various points
+      const ratio = w / nw
+      const difference = nw - nh;
+      const origToCrop = (ratio * difference) / 2;
+      origCanvas.width = w - (origToCrop * 2);
+
+      // draw image with params: imgobj, sx, sy, swidth, sheight
+      origCtx.drawImage(sqrImgObj, -origToCrop, 0, w - origToCrop, h);
+
+      const newDiv = document.createElement('div');
+      newDiv.class = "col-lg-3 col-md-4 col-6";
+
+      newDiv.innerHTML = `
+        <a href="#" class="d-block mb-4 h-100">
+          <img class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
+        </a>
+      `;
+
+      document.querySelector('#thumbnails').append(newDiv);
+    }
+  };
+
   const cropImage = (imgUrl) => {
     // take original image and make it square:
 
@@ -97,42 +143,25 @@ document.addEventListener('DOMContentLoaded', e => {
             i++;
           }
         }
-    
-
         const emptyTile = document.querySelector(`#tile-15`);
-        emptyTile.innerHTML = '';
-        
-        
+        emptyTile.innerHTML = '';    
       }
     }
-  }
-
-//   const calculateGridColumnWidth = numSquares => {
-//         //take in number of squares ie 3x3
-//         //height of one piece is equal to nh / over passed in value
-//         //get div element. 
-//         const gridContainer = document.querySelector('.grid-container')
-//         let px = ''
-//         for(let i = 0; i < numSquares; i++){
-//             width = Math.floor(800/numSquares)
-//             px += `${width}px `
-//         }
-//         gridContainer.style.gridTemplateColumns = px
-//         gridContainer.style.gridTemplateRows = px
-//   }
-  
-
+  } 
 
   $(document).ready(function () {
-
     $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
-  
   });
 
-  
   const login = (user) => {
+    const hiddenNavs = document.querySelectorAll('.hide-until-login');
+    for (let nav of hiddenNavs) {
+      nav.hidden = false;
+    }
+    document.querySelector('#login-nav').hidden="true";
+    document.querySelector('.hide-until-login').className = "hide-until-login active";
     userId = user.id;
     const form = document.querySelector('#login')
     form.hidden = true
@@ -140,6 +169,12 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const getImages = () => {
+    const puzzleContainer = document.querySelector('#thumbnails')
+    while(puzzleContainer.firstElementChild){
+        puzzleContainer.firstElementChild.remove()
+    }
+    const solvedPuzzles = document.querySelector('#user-solved-puzzle-container')
+    solvedPuzzles.hidden = true
     fetch('http://localhost:3000/images')
       .then(resp => resp.json())
       .then(json => renderImages(json))
@@ -164,52 +199,6 @@ document.addEventListener('DOMContentLoaded', e => {
     }
   }
 
-  const squareImg = (id, img_url) => {
-    const origCanvas = document.createElement('canvas');
-    const origCtx = origCanvas.getContext('2d');
-
-    // create the Image object we'll be using the canvas methods on
-    const sqrImgObj = new Image();
-    sqrImgObj.crossOrigin = "anonymous";
-    sqrImgObj.src = img_url;
-
-    // once the square Image is loaded
-    sqrImgObj.onload = function () {
-
-      // desired width to base square off of
-      const h = 800;
-
-      // original image width and height so we can figure out the aspect ratio
-      const nw = sqrImgObj.naturalWidth;
-      const nh = sqrImgObj.naturalHeight;
-      const aspect = nw / nh;
-      const w = h * aspect;
-
-      // now we can assign the height to the canvas (shorter side)
-      origCanvas.height = h;
-
-      // ratio helps us figure out how much to crop at various points
-      const ratio = w / nw
-      const difference = nw - nh;
-      const origToCrop = (ratio * difference) / 2;
-      origCanvas.width = w - (origToCrop * 2);
-
-      // draw image with params: imgobj, sx, sy, swidth, sheight
-      origCtx.drawImage(sqrImgObj, -origToCrop, 0, w - origToCrop, h);
-
-      const newDiv = document.createElement('div');
-      newDiv.class = "col-lg-3 col-md-4 col-6";
-
-      newDiv.innerHTML = `
-        <a href="#" class="d-block mb-4 h-100">
-          <img class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
-        </a>
-      `;
-
-      document.querySelector('#thumbnails').append(newDiv);
-    }
-  };
-
   const clickHandler = () => {
     document.addEventListener('submit', e => {
       e.preventDefault();
@@ -233,10 +222,10 @@ document.addEventListener('DOMContentLoaded', e => {
   
       }
     })
-
-    
   
     document.addEventListener('click', e => {
+        let emptyPosIndex = findEmptyTilePosition();
+        let moveablePositions = moveableTilePositions(emptyPosIndex);
       if(e.target.matches('#showPuzzle')){
         const showPuzzleButton = document.querySelector('#showPuzzle')
         showPuzzleButton.hidden = true
@@ -248,11 +237,11 @@ document.addEventListener('DOMContentLoaded', e => {
       } else if (e.target.matches('.img-thumbnail')) {
         renderSelectedImageAsPuzzle(e.target)
       } else if (e.target.matches('.completed-puzzles')){
-         
+            clickAwayFromPuzzle()
+          resetActiveNavBarElement(e.target)
           const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container')
           userCompletedPuzzles.hidden = false
-          const puzzleGallery = document.querySelector('.puzzle-container')
-          puzzleGallery.hidden = true
+          
 
           const solvedPuzzleMovesAndId = []
           fetch(`http://localhost:3000/users/${userId}`)
@@ -264,12 +253,8 @@ document.addEventListener('DOMContentLoaded', e => {
                     puzzleIdAndMoves.image_id = userImage.image_id
                     puzzleIdAndMoves.moves = userImage.moves
                     solvedPuzzleMovesAndId.push(puzzleIdAndMoves)
-                    // solvedPuzzleMovesAndId.push(userImage.image_id)
-                    
                 }
-               
             }
-            // console.log(solvedPuzzleMovesAndId)
             const solvedPuzzles = []
             //for all of a users images, see if they match and if so get the pic url
             for(let puzzleHash of solvedPuzzleMovesAndId){
@@ -284,6 +269,21 @@ document.addEventListener('DOMContentLoaded', e => {
             // run crop object on both imgage urls from solvedPuzzles 
           })
           
+      } else if (e.target.matches('.puzzle-gallery')){
+        resetActiveNavBarElement(e.target)
+        getImages();
+      } else if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {     
+        const movesCounter = document.querySelector('#moves-counter')
+        movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
+        swapTiles(e.target.parentElement);
+        isSolved()
+      } else if (e.target.matches('#scramble')) {
+        const movesCounter = document.querySelector('#moves-container')
+        const imageGrid = document.querySelector('.grid-container')
+       
+        imageGrid.style.pointerEvents = 'auto'
+        // movesCounter.hidden = false
+        scrambleTiles();
       }
     })
 
@@ -293,6 +293,16 @@ document.addEventListener('DOMContentLoaded', e => {
     })
   }
 
+  const resetActiveNavBarElement = el => {
+      const navElements = document.querySelectorAll('.nav-link')
+      for(let element of navElements){
+          if(element.parentElement.matches('.active')){
+            element.parentElement.classList.remove('active')
+        }
+      }
+      el.parentElement.classList.add('active')
+  }
+
   const renderSelectedImageAsPuzzle = el => {
     const imgId = el.dataset.imgId;
     const imageGrid = document.querySelector('.grid-container')
@@ -300,9 +310,6 @@ document.addEventListener('DOMContentLoaded', e => {
     const leaderboard = document.querySelector('.leaderboard-container')
     renderLeaderboard(imgId);
     leaderboard.hidden = false
-   
-        // imageGrid.style.pointerEvents = 'none';
-    // }
 
     const userImagesObj = {
       user_id: userId,
@@ -322,53 +329,37 @@ document.addEventListener('DOMContentLoaded', e => {
     })
   }
 
+  const clickAwayFromPuzzle = () => {
+    const gridContainer = document.querySelector('.grid-container')
+    gridContainer.hidden = true
+    const puzzleGallery = document.querySelector('.puzzle-container')
+    puzzleGallery.hidden = true
+    const movesContainer = document.querySelector('#moves-container')
+    movesContainer.hidden = true
+    const scrambleButton = document.querySelector('#scramble');
+    scrambleButton.hidden = true;
+  }
+
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const imageGallery = document.querySelector('.puzzle-container');
     imageGallery.hidden = true;
+    const movesContainer = document.querySelector('#moves-container')
+    movesContainer.hidden = false
     const gridContainer = document.querySelector('.grid-container');
-    gridContainer.dataset.userImageId = userImageId
+    gridContainer.dataset.userImageId = userImageId;
     gridContainer.hidden = false;
-    const scrambleButton = document.querySelector('#scramble')
-    scrambleButton.hidden = false
+    const scrambleButton = document.querySelector('#scramble');
+    scrambleButton.hidden = false;
    
     cropImage(puzzleUrl)
-
-  }
-
+  };
 
   const findEmptyTilePosition = () => {
     return parseInt(document.querySelector('#tile-15').parentElement.id, 10)
   };
 
   const moveableTilePositions = (emptyPosIndex) => {
-    // this is a 3x3 grid. should be fairly easy to manually dictate which tiles you can move based on emptyPosIndex.
-    // to generalize this to any grid, we would need to find the corners
-    // and each side. set different rules for each category: corner, each side, middle
-    // not worth it for a grid of 9, but for a grid of 25 for example we could totally do it
-
-
-    // switch(emptyPosIndex) {
-    //   case 0:
-    //     return [1, 3];
-    //   case 1:
-    //     return [0, 2, 4];
-    //   case 2:
-    //     return [1, 5];
-    //   case 3:
-    //     return [0, 4, 6];
-    //   case 4:
-    //     return [1, 3, 5, 7];
-    //   case 5:
-    //     return [2, 4, 8];
-    //   case 6:
-    //     return [3, 7];
-    //   case 7:
-    //     return [4, 6, 8];
-    //   case 8:
-    //     return [5, 7];
-    // }
-
     switch(emptyPosIndex) {
         case 0:
           return [1, 4];
@@ -407,9 +398,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
   const swapTiles = (tileToMove) => {
     let posToPlace = tileToMove.parentElement;
-
     let emptyPosIndex = findEmptyTilePosition();
-
     let emptyTile = document.getElementById(`${emptyPosIndex}`).firstChild;
 
     emptyTile.remove();
@@ -420,43 +409,17 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const scrambleTiles = () => {
-    for (let i = 0; i < 100; i++) {
-      
+    for (let i = 0; i < 100; i++) {    
       let emptyPosIndex = findEmptyTilePosition();
-
       let moveablePositions = moveableTilePositions(emptyPosIndex);
-
       let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
-
       let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
 
       swapTiles(tileToMove)
     }
   };
 
-  const moveClickHandler = () => {
-    document.addEventListener('click', e => {
-      let emptyPosIndex = findEmptyTilePosition();
 
-      let moveablePositions = moveableTilePositions(emptyPosIndex);
-
-      if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
-      
-        const movesCounter = document.querySelector('#moves-counter')
-        movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
-        swapTiles(e.target.parentElement);
-        isSolved()
-        
-      } else if (e.target.matches('#scramble')) {
-        const movesCounter = document.querySelector('#moves-container')
-        const imageGrid = document.querySelector('.grid-container')
-       
-        imageGrid.style.pointerEvents = 'auto'
-        // movesCounter.hidden = false
-        scrambleTiles();
-      }
-    });
-  };
 
   const isSolved = () => {
     const gridItems = document.querySelectorAll('.grid-item')
@@ -464,22 +427,15 @@ document.addEventListener('DOMContentLoaded', e => {
     for(let position of gridItems){
         const tileIdLengthToGet = position.firstElementChild.id.length + 5 
         const tileId = position.firstElementChild.id.slice(5, `${tileIdLengthToGet}`)
-        
-        // if(position.firstElementChild.id.length === 6)
-        // const tileId = position.firstElementChild.id.charAt(position.firstElementChild.id.length - 1)
-        // console.log(position.firstElementChild.id)
        
       if(position.id !== tileId){
         flag = false;
-        // debugger
       }
-    //   console.log("position id:", position.id, "tileId:", tileId)
     }
     if(flag === true){
       const userImageId = document.querySelector('.grid-container').dataset.userImageId
       const moves = parseInt(document.querySelector('#moves-counter').innerText, 10)
 
-      
       const userImageObj = {
         moves: moves,
         completed: true
@@ -493,10 +449,7 @@ document.addEventListener('DOMContentLoaded', e => {
       fetch(`http://localhost:3000/user_images/${userImageId}`, options)
       .then(response => response.json())
       .then(json => endOfGame())
-
-
     }
-    
   }
 
   const endOfGame = () => {
@@ -565,14 +518,12 @@ document.addEventListener('DOMContentLoaded', e => {
           <td>${sortedResults[i].username}</td>              
           <td>${sortedResults[i].moves}</td>
         `
-        leaderboard.append(row)
-       
+        leaderboard.append(row);
       }
     })
   }
 
   clickHandler();
-  moveClickHandler();
 
 });
 

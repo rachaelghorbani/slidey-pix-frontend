@@ -61,47 +61,39 @@
     <div class="wrapper">
       <nav id="sidebar">
         <div class="sidebar-header">
-          <h3>Slidey Pix</h3>
+          <h3 class="text-center">Slidey Pix</h3>
         </div>
 
         <ul class="list-unstyled components">
-          <p>Dummy Heading</p>
-          <li class="active">
-            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
-            <ul class="collapse list-unstyled" id="homeSubmenu">
-              <li>
-                <a href="#">Home 1</a>
-              </li>
-              <li>
-                <a href="#">Home 2</a>
-              </li>
-              <li>
-                <a href="#">Home 3</a>
-              </li>
-            </ul>
+          <p class="text-center">The Greatest Puzzle Game of Our Generation!</p>
+          <li class="active" id="login-nav">
+            <a href="#" class="nav-link">Login</a>
           </li>
-          <li>
-            <a href="#">About</a>
+          <li class="hide-until-login" hidden="true">
+            <a href="#" class="nav-link puzzle-gallery">Puzzle Gallery</a>
           </li>
-          <li>
-            <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
+          <li class="hide-until-login" hidden="true">
+            <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">Categories</a>
             <ul class="collapse list-unstyled" id="pageSubmenu">
               <li>
-                <a href="#">Page 1</a>
+                <a href="#">Animals</a>
               </li>
               <li>
-                <a href="#">Page 2</a>
+                <a href="#">Landscapes</a>
               </li>
               <li>
-                <a href="#">Page 3</a>
+                <a href="#">People</a>
               </li>
             </ul>
           </li>
-          <li>
-            <a href="#">Portfolio</a>
+          <li class="hide-until-login" hidden="true">
+            <a href="#" class="nav-link">Create Your Own Puzzle</a>
           </li>
-          <li>
-            <a class="completed-puzzles" href="#">My Completed Puzzles</a>
+          <li class="hide-until-login" hidden="true">
+            <a class="completed-puzzles nav-link" href="#">View Completed Puzzles</a>
+          </li>
+          <li class="hide-until-login" hidden="true">
+            <a href="#" class="nav-link">Logout</a>
           </li>
         </ul>
         <div class="leaderboard-container" hidden="true">
@@ -136,7 +128,7 @@
         </nav>
 
         <button id="scramble" hidden=true >Scramble!</button>
-        <p id="moves-container" >Moves: <span id="moves-counter">0</span></p>
+        <p id="moves-container" hidden="true">Moves: <span id="moves-counter">0</span></p>
 
         <form id="login">
           <label for="username">Username:</label>        
@@ -153,11 +145,11 @@
 
 
         <div id="user-solved-puzzle-container" hidden="true">
-            <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0">My Solved Puzzles</h1>
+            <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0">Completed Puzzles</h1>
             <hr class="mt-2 mb-5">
             <div class="row text-center text-lg-left" id="thumbnails">
             </div>
-          </div>
+        </div>
 
 
 
@@ -195,6 +187,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
+  
   </body>
 </html>
