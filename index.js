@@ -441,40 +441,27 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const moveableTilePositions = (emptyPosIndex) => {
-    switch(emptyPosIndex) {
-        case 0:
-          return [1, 4];
-        case 1:
-          return [0, 2, 5];
-        case 2:
-          return [1, 3, 6];
-        case 3:
-          return [2, 7];
-        case 4:
-          return [0, 5, 8];
-        case 5:
-          return [1, 4, 6, 9];
-        case 6:
-          return [2, 5, 7, 10];
-        case 7:
-          return [3, 6, 11];
-        case 8:
-          return [4, 9, 12];
-        case 9:
-          return [5, 8, 10, 13];
-        case 10:
-          return [6, 9, 11, 14];
-        case 11:
-          return [7, 10, 15];
-        case 12:
-          return [8, 13];
-        case 13:
-          return [9, 12, 14];
-        case 14:
-          return [10, 13, 15];
-        case 15:
-          return [11, 14];
-      }
+    // above: -1, below: +1, left: -4, right: +4
+    // if < 4, no left
+    // if > 11, no right
+    // if % 4 = 0, no above
+    // if % 4 = 3, no below
+    const gridSize = 16; // for custom grid sizes, just pass grid size as param and the rest will work
+    const rowSize = Math.sqrt(gridSize);
+    const allowedPos = [];
+    if (emptyPosIndex >= rowSize) {
+      allowedPos.push(emptyPosIndex - rowSize);
+    }
+    if (emptyPosIndex <= gridSize - 1 - rowSize) {
+      allowedPos.push(emptyPosIndex + rowSize);
+    }
+    if (emptyPosIndex % rowSize != 0) {
+      allowedPos.push(emptyPosIndex - 1);
+    }
+    if (emptyPosIndex % rowSize != rowSize - 1) {
+      allowedPos.push(emptyPosIndex + 1);
+    }
+    return allowedPos;
   };
 
   const swapTiles = (tileToMove) => {
@@ -496,11 +483,9 @@ document.addEventListener('DOMContentLoaded', e => {
       let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
       let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
 
-      swapTiles(tileToMove)
+      swapTiles(tileToMove);
     }
   };
-
-
 
   const isSolved = () => {
     const gridItems = document.querySelectorAll('.grid-item')
