@@ -286,6 +286,11 @@ document.addEventListener('DOMContentLoaded', e => {
           
       }
     })
+
+    $('#exampleModal').on('hide.bs.modal', e => {
+      const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
+      renderLeaderboard(imgId);
+    })
   }
 
   const renderSelectedImageAsPuzzle = el => {
@@ -296,7 +301,7 @@ document.addEventListener('DOMContentLoaded', e => {
     renderLeaderboard(imgId);
     leaderboard.hidden = false
    
-        imageGrid.style.pointerEvents = 'none';
+        // imageGrid.style.pointerEvents = 'none';
     // }
 
     const userImagesObj = {
@@ -384,7 +389,7 @@ document.addEventListener('DOMContentLoaded', e => {
         case 8:
           return [4, 9, 12];
         case 9:
-          return [5, 8, 10, 12];
+          return [5, 8, 10, 13];
         case 10:
           return [6, 9, 11, 14];
         case 11:
@@ -394,7 +399,7 @@ document.addEventListener('DOMContentLoaded', e => {
         case 13:
           return [9, 12, 14];
         case 14:
-          return [10, 12, 15];
+          return [10, 13, 15];
         case 15:
           return [11, 14];
       }
@@ -532,6 +537,11 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
   const renderLeaderboard = imgId => {
+    const leaderboard = document.querySelector('#ul-tbody')
+    while (leaderboard.firstElementChild) {
+      leaderboard.firstElementChild.remove();
+    }
+
     fetch('http://localhost:3000/user_images')
     .then(response => response.json())
     .then(json => {
