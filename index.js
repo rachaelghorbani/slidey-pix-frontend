@@ -73,14 +73,14 @@ document.addEventListener('DOMContentLoaded', e => {
     // once the square Image is loaded
     sqrImgObj.onload = function () {
 
-      // desired width to base square off of
-      const w = 1200;
+      // desired height to base square off of
+      const h = window.innerHeight;
 
       // original image width and height so we can figure out the aspect ratio
       const nw = sqrImgObj.naturalWidth;
       const nh = sqrImgObj.naturalHeight;
       const aspect = nw / nh;
-      const h = w / aspect;
+      const w = h * aspect;
 
       // now we can assign the height to the canvas (shorter side)
       origCanvas.height = h;
@@ -107,10 +107,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
         // array that will hold the chopped up pieces
         let imagePieces = [];
-
-        // counter to help us stick the pieces in the appropriate places
         let i = 0;
-
         // nested loops go through the cells of the grid we're chopping into
         // starts at top left, moves down the column, then to the next column etc
         for (let x = 0; x < 4; ++x) {
@@ -128,7 +125,8 @@ document.addEventListener('DOMContentLoaded', e => {
             // const h = w / aspect;
 
             //height of the canvas we want
-            canvas.height = 198;
+            canvas.height = window.innerHeight / 5;
+            canvas.width = canvas.height;
             // const ratio = w / nw;
             
             // const difference = nw - nh;
@@ -139,7 +137,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
             // ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
 
-            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
+            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width, canvas.height);
             
             // every new canvas gets pushed to the imagePieces array as a new element
             imagePieces.push(canvas.toDataURL());
