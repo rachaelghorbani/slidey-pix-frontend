@@ -115,29 +115,14 @@ document.addEventListener('DOMContentLoaded', e => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // these variables are same deal as above
-            // not sure if we're supposed to have the consts here or just use lets above but it works so whatever
-            // const w = canvas.width;
-            // const nw = imgObj.naturalWidth;
             const nh = imgObj.naturalHeight;
             
-            // const aspect = nw / nh
-            // const h = w / aspect;
-
-            //height of the canvas we want
             canvas.height = window.innerHeight / 5;
             canvas.width = canvas.height;
-            // const ratio = w / nw;
-            
-            // const difference = nw - nh;
-            // const toCrop = (ratio * difference) / 2;
-            // canvas.width = w - (toCrop * 2)
             const heightOfOnePiece = nh / 4;
             const widthOfOnePiece = heightOfOnePiece;
 
-            // ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, 198, 198);
-
-            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width - 2, canvas.height - 2);
             
             // every new canvas gets pushed to the imagePieces array as a new element
             imagePieces.push(canvas.toDataURL());
@@ -244,7 +229,9 @@ document.addEventListener('DOMContentLoaded', e => {
 
   const renderImages = (images) => {
     for (let image of images) {
-      renderImage(image);
+      if (image.owner === null || image.owner.id === userId) {
+        renderImage(image);
+      }
     }
   };
 
@@ -374,6 +361,9 @@ document.addEventListener('DOMContentLoaded', e => {
         imageGrid.style.pointerEvents = 'auto'
         // movesCounter.hidden = false
         scrambleTiles();
+      } else if (e.target.matches('.create-puzzle')){
+        clearContent()
+        resetActiveNavBarElement(e.target)
       }
     })
 
@@ -498,21 +488,28 @@ document.addEventListener('DOMContentLoaded', e => {
     }
     if(flag === true){
       const userImageId = document.querySelector('.grid-container').dataset.userImageId
-      const moves = parseInt(document.querySelector('#moves-counter').innerText, 10)
-
-      const userImageObj = {
-        moves: moves,
-        completed: true
-      }
-      const options = {
-        method: "PATCH",
-        headers: headers,
-        body: JSON.stringify(userImageObj)
-      }
-
-      fetch(`http://localhost:3000/user_images/${userImageId}`, options)
-      .then(response => response.json())
-      .then(json => endOfGame())
+      const latestMoves = parseInt(document.querySelector('#moves-counter').innerText, 10)
+      
+      fetch(`http://localhost:3000/user_images/${userImageId}`)
+        .then(response => response.json())
+        .then(json => {
+          if (json.moves > 0 && latestMoves < json.moves) {
+            const userImageObj = {
+              moves: latestMoves,
+              completed: true
+            }
+            const options = {
+              method: "PATCH",
+              headers: headers,
+              body: JSON.stringify(userImageObj)
+            }
+            fetch(`http://localhost:3000/user_images/${userImageId}`, options)
+              .then(response => response.json())
+              .then(json => endOfGame())
+          } else {
+            endOfGame();
+          }
+        })
     }
   }
 
