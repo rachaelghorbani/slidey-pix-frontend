@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', e => {
         origCanvas.height = h;
 
         // ratio helps us figure out how much to crop at various points
-        const ratio = w / nw
+        const ratio = w / nw;
         const difference = nw - nh;
         const origToCrop = (ratio * difference) / 2;
         origCanvas.width = w - (origToCrop * 2);
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const cropImage = (imgUrl) => {
-    
+
     // take original image and make it square:
 
     // create a temp canvas for the square image
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', e => {
         origCanvas.height = h;
 
         // ratio helps us figure out how much to crop at various points
-        const ratio = w / nw
+        const ratio = w / nw;
         const difference = nw - nh;
         const origToCrop = (ratio * difference) / 2;
         origCanvas.width = w - (origToCrop * 2);
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', e => {
       <div class="grid-item" id="11"><div class="tile" id="tile-11"></div></div>
       <div class="grid-item" id="15"><div class="tile" id="tile-15"></div></div>
     `;
-    contentDiv.append(newDiv)
+    contentDiv.append(newDiv);
   };
 
   $(document).ready(function () {
@@ -216,8 +216,8 @@ document.addEventListener('DOMContentLoaded', e => {
     document.querySelector('#login-nav').hidden = "true";
     document.querySelector('.hide-until-login').className = "hide-until-login active";
     userId = user.id;
-    const form = document.querySelector('#login')
-    form.hidden = true
+    const form = document.querySelector('#login');
+    form.hidden = true;
     getImages();
   };
 
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
     fetch('http://localhost:3000/images')
       .then(resp => resp.json())
-      .then(json => renderImages(json, category))
+      .then(json => renderImages(json, category));
   };
 
   const renderImages = (images, category) => {
@@ -268,11 +268,9 @@ document.addEventListener('DOMContentLoaded', e => {
         if (typeof category !== 'undefined') {
           if (image.category.name === category.toLowerCase()) {
             renderImage(image);
-            // return;
           }
         } else {
           renderImage(image);
-          // return;
         }
       }
     }
@@ -282,7 +280,7 @@ document.addEventListener('DOMContentLoaded', e => {
     let flag = false;
     for (let user of image.users) {
       if (user.id === userId) {
-        // flag = true
+        // flag = true;
       }
     }
     if (flag === false) {
@@ -293,74 +291,85 @@ document.addEventListener('DOMContentLoaded', e => {
   const clickHandler = () => {
     document.addEventListener('submit', e => {
       e.preventDefault();
-      if (e.target.matches('#login')) {
 
-        const username = e.target.username.value
+      if (e.target.matches('#login')) {
+        const username = e.target.username.value;
 
         const userObj = {
           username: username
-        }
+        };
 
         const options = {
           method: "POST",
           headers: headers,
           body: JSON.stringify(userObj)
-        }
+        };
 
         fetch('http://localhost:3000/users', options)
           .then(resp => resp.json())
-          .then(json => login(json))
+          .then(json => login(json));
 
       } else if (e.target.matches('#add-image')) {
-        clearContent()
+        clearContent();
         fetch('http://localhost:3000/categories')
           .then(resp => resp.json())
           .then(json => {
             let categoryId;
+
             for (let category of json) {
               if (category.name === "my custom puzzles") {
                 categoryId = category.id;
               }
             }
-            const form = e.target
+
+            const form = e.target;
 
             const imgObj = {
               img_url: form.img_url.value,
               user_id: userId,
               category_id: categoryId
-            }
+            };
 
             const options = {
               method: "POST",
               headers: headers,
               body: JSON.stringify(imgObj)
-            }
+            };
 
             fetch("http://localhost:3000/images", options)
               .then(response => response.json())
               .then(json => {
                 addPuzzleGrid();
-                renderSelectedImageAsPuzzle(json.id)
-              })
-          })
+                renderSelectedImageAsPuzzle(json.id);
+              });
+          });
       }
-    })
+    });
 
     document.addEventListener('click', e => {
+      if (document.querySelector('.grid-container')) {
+        let emptyPosIndex = findEmptyTilePosition();
+        let moveablePositions = moveableTilePositions(emptyPosIndex);
 
-
+        if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
+          const movesCounter = document.querySelector('#moves-counter');
+          movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
+          swapTiles(e.target.parentElement);
+          isSolved();
+        }
+      }
       if (e.target.matches('#showPuzzle')) {
-        const showPuzzleButton = document.querySelector('#showPuzzle')
-        showPuzzleButton.hidden = true
+        const showPuzzleButton = document.querySelector('#showPuzzle');
+        showPuzzleButton.hidden = true;
         const scramblePuzzleButton = document.querySelector('#scramble');
         scramblePuzzleButton.hidden = false;
-        const gridContainer = document.querySelector('.grid-container')
-        gridContainer.hidden = false
+        const gridContainer = document.querySelector('.grid-container');
+        gridContainer.hidden = false;
 
       } else if (e.target.matches('.img-thumbnail')) {
         addPuzzleGrid();
         const imgId = e.target.dataset.imgId;
-        renderSelectedImageAsPuzzle(imgId)
+        renderSelectedImageAsPuzzle(imgId);
       } else if (e.target.matches('.completed-puzzles')) {
         clearContent();
         const solvedContainer = document.createElement('div');
@@ -384,154 +393,141 @@ document.addEventListener('DOMContentLoaded', e => {
 
         contentDiv.append(solvedContainer);
 
-        resetActiveNavBarElement(e.target)
-        const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container')
-        userCompletedPuzzles.hidden = false
+        resetActiveNavBarElement(e.target);
+        const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container');
+        userCompletedPuzzles.hidden = false;
 
 
-        const solvedPuzzleMovesAndId = []
+        const solvedPuzzleMovesAndId = [];
         fetch(`http://localhost:3000/users/${userId}`)
           .then(response => response.json())
           .then(user => {
             for (let userImage of user.user_images) {
               if (userImage.completed === true) {
-                const puzzleIdAndMoves = {}
-                puzzleIdAndMoves.image_id = userImage.image_id
-                puzzleIdAndMoves.moves = userImage.moves
-                solvedPuzzleMovesAndId.push(puzzleIdAndMoves)
+                const puzzleIdAndMoves = {};
+                puzzleIdAndMoves.image_id = userImage.image_id;
+                puzzleIdAndMoves.moves = userImage.moves;
+                solvedPuzzleMovesAndId.push(puzzleIdAndMoves);
               }
             }
-            const solvedPuzzles = []
+            const solvedPuzzles = [];
             //for all of a users images, see if they match and if so get the pic url
             for (let puzzleHash of solvedPuzzleMovesAndId) {
               for (let image of user.images) {
                 if (image.id === puzzleHash.image_id) {
-                  puzzleHash.img_url = image.img_url
-                  solvedPuzzles.push(puzzleHash)
+                  puzzleHash.img_url = image.img_url;
+                  solvedPuzzles.push(puzzleHash);
                 }
               }
             }
             for (let puzzle of solvedPuzzles) {
-              squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves)
+              squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves);
             }
-          })
+          });
 
       } else if (e.target.matches('.puzzle-gallery')) {
-        resetActiveNavBarElement(e.target)
+        resetActiveNavBarElement(e.target);
         getImages();
-      } else if (document.querySelector('.grid-container')) {
-        let emptyPosIndex = findEmptyTilePosition();
-        let moveablePositions = moveableTilePositions(emptyPosIndex);
-
-        if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
-          const movesCounter = document.querySelector('#moves-counter')
-          movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
-          swapTiles(e.target.parentElement);
-          isSolved()
-        }
       } else if (e.target.matches('#scramble')) {
-        const movesCounter = document.querySelector('#moves-container')
-        const imageGrid = document.querySelector('.grid-container')
+        const movesCounter = document.querySelector('#moves-container');
+        const imageGrid = document.querySelector('.grid-container');
 
-        imageGrid.style.pointerEvents = 'auto'
-        // movesCounter.hidden = false
+        imageGrid.style.pointerEvents = 'auto';
+        // movesCounter.hidden = false;
         scrambleTiles();
       } else if (e.target.matches('.create-puzzle')) {
-        clearContent()
-        resetActiveNavBarElement(e.target)
+        clearContent();
+        resetActiveNavBarElement(e.target);
 
-        const form = document.createElement('form')
-        form.id = "add-image"
-        const formDiv = document.createElement('div')
-        formDiv.className = "form-group"
-        const imgLabel = document.createElement('label')
-        imgLabel.textContent = "Image URL: "
-        imgLabel.for = "img_url"
-        const submitButton = document.createElement('button')
-        submitButton.textContent = "Create Puzzle!"
-        submitButton.type = 'submit'
+        const form = document.createElement('form');
+        form.id = "add-image";
+        const formDiv = document.createElement('div');
+        formDiv.className = "form-group";
+        const imgLabel = document.createElement('label');
+        imgLabel.textContent = "Image URL: ";
+        imgLabel.for = "img_url";
+        const submitButton = document.createElement('button');
+        submitButton.textContent = "Create Puzzle!";
+        submitButton.type = 'submit';
 
+        const imgInput = document.createElement('input');
+        imgInput.className = "form-control";
+        imgInput.type = "text";
+        imgInput.name = "img_url";
 
-        const imgInput = document.createElement('input')
-        imgInput.className = "form-control"
-        imgInput.type = "text"
-        imgInput.name = "img_url"
-
-        formDiv.append(imgLabel)
-        formDiv.append(imgInput)
-        form.append(formDiv)
-        form.append(submitButton)
-        contentDiv.append(form)
+        formDiv.append(imgLabel);
+        formDiv.append(imgInput);
+        form.append(formDiv);
+        form.append(submitButton);
+        contentDiv.append(form);
       } else if (e.target.matches('.logout')) {
 
-        userId = ''
-        clearContent()
-        const toHide = document.querySelectorAll('.hide-until-login')
+        userId = '';
+        clearContent();
+        const toHide = document.querySelectorAll('.hide-until-login');
+        
         for (let nav of toHide) {
-          nav.hidden = true
+          nav.hidden = true;
         }
-        const loginNav = document.querySelector('#login-nav')
+
+        const loginNav = document.querySelector('#login-nav');
         loginNav.hidden = false;
 
-        const formDiv = document.createElement('div')
+        const formDiv = document.createElement('div');
         formDiv.innerHTML = `
           <form id="login">
           <label for="username">Username:</label>        
           <input type="textfield" name="username" value=""><br>
           <button type="submit" id="play">Play!</button>
           </form>
-        `
-        contentDiv.append(formDiv)
+        `;
+        contentDiv.append(formDiv);
       } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
-        resetActiveNavBarElement(e.target)
-        getImages(e.target.textContent)
+        resetActiveNavBarElement(e.target);
+        getImages(e.target.textContent);
       }
     })
-
-
 
     $('#exampleModal').on('hide.bs.modal', e => {
       const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
       renderLeaderboard(imgId);
     })
-  }
+  };
 
   const resetActiveNavBarElement = el => {
-    const navElements = document.querySelectorAll('.nav-link')
+    const navElements = document.querySelectorAll('.nav-link');
     for (let element of navElements) {
       if (element.parentElement.matches('.active')) {
-        element.parentElement.classList.remove('active')
+        element.parentElement.classList.remove('active');
       }
     }
-    el.parentElement.classList.add('active')
-  }
+    el.parentElement.classList.add('active');
+  };
 
   const renderSelectedImageAsPuzzle = imgId => {
-
-    const imageGrid = document.querySelector('.grid-container')
-    imageGrid.dataset.imgId = imgId
-    const leaderboard = document.querySelector('.leaderboard-container')
+    const imageGrid = document.querySelector('.grid-container');
+    imageGrid.dataset.imgId = imgId;
+    const leaderboard = document.querySelector('.leaderboard-container');
     renderLeaderboard(imgId);
-    leaderboard.hidden = false
+    leaderboard.hidden = false;
 
     const userImagesObj = {
       user_id: userId,
       image_id: imgId
-    }
+    };
 
     const options = {
       method: "POST",
       headers: headers,
       body: JSON.stringify(userImagesObj)
-    }
+    };
 
     fetch('http://localhost:3000/user_images/', options)
       .then(response => response.json())
       .then(json => {
         renderPuzzle(json.id, json.image.img_url);
-      })
-  }
-
+      });
+  };
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const newDiv = document.createElement('div');
@@ -544,11 +540,11 @@ document.addEventListener('DOMContentLoaded', e => {
     contentDiv.insertBefore(newDiv, gridContainer);
     gridContainer.dataset.userImageId = userImageId;
 
-    cropImage(puzzleUrl)
+    cropImage(puzzleUrl);
   };
 
   const findEmptyTilePosition = () => {
-    return parseInt(document.querySelector('#tile-15').parentElement.id, 10)
+    return parseInt(document.querySelector('#tile-15').parentElement.id, 10);
   };
 
   const moveableTilePositions = (emptyPosIndex) => {
@@ -599,19 +595,19 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const isSolved = () => {
-    const gridItems = document.querySelectorAll('.grid-item')
+    const gridItems = document.querySelectorAll('.grid-item');
     let flag = true;
     for (let position of gridItems) {
-      const tileIdLengthToGet = position.firstElementChild.id.length + 5
-      const tileId = position.firstElementChild.id.slice(5, `${tileIdLengthToGet}`)
+      const tileIdLengthToGet = position.firstElementChild.id.length + 5;
+      const tileId = position.firstElementChild.id.slice(5, `${tileIdLengthToGet}`);
 
       if (position.id !== tileId) {
         flag = false;
       }
     }
     if (flag === true) {
-      const userImageId = document.querySelector('.grid-container').dataset.userImageId
-      const latestMoves = parseInt(document.querySelector('#moves-counter').innerText, 10)
+      const userImageId = document.querySelector('.grid-container').dataset.userImageId;
+      const latestMoves = parseInt(document.querySelector('#moves-counter').innerText, 10);
 
       fetch(`http://localhost:3000/user_images/${userImageId}`)
         .then(response => response.json())
@@ -628,11 +624,11 @@ document.addEventListener('DOMContentLoaded', e => {
             }
             fetch(`http://localhost:3000/user_images/${userImageId}`, options)
               .then(response => response.json())
-              .then(json => endOfGame())
+              .then(json => endOfGame());
           } else {
             endOfGame();
           }
-        })
+        });
     }
   }
 
@@ -644,40 +640,42 @@ document.addEventListener('DOMContentLoaded', e => {
       .then(response => response.json())
       .then(json => {
         const results = [];
+
         for (let userImage of json) {
           if (userImage.image_id == imgId && userImage.completed == true) {
             results.push({
               "username": userImage.user.username,
               "moves": userImage.moves
-            })
+            });
           }
         }
+
         const sortedResults = results.sort(function (a, b) {
           return (a.moves > b.moves) ? 1 : -1;
         });
-        const leaderboard = document.querySelector('#modal-tbody')
+
+        const leaderboard = document.querySelector('#modal-tbody');
+
         for (let i = 0; i < sortedResults.length; i++) {
-          const row = document.createElement('tr')
+          const row = document.createElement('tr');
           row.innerHTML = `
           <th scope="row">${i + 1}</th>
           <td>${sortedResults[i].username}</td>              
           <td>${sortedResults[i].moves}</td>
-        `
-          leaderboard.append(row)
+        `;
+          leaderboard.append(row);
         }
       })
 
     const modalButton = document.querySelector('#show-modal');
     modalButton.click();
-    const imageGrid = document.querySelector('.grid-container')
-    imageGrid.style.pointerEvents = 'none'
+    const imageGrid = document.querySelector('.grid-container');
+    imageGrid.style.pointerEvents = 'none';
   }
 
   const renderLeaderboard = imgId => {
-    const leaderboard = document.querySelector('#ul-tbody')
-    while (leaderboard.firstElementChild) {
-      leaderboard.firstElementChild.remove();
-    }
+    const leaderboard = document.querySelector('#ul-tbody');
+    removeChildren(leaderboard);
 
     fetch('http://localhost:3000/user_images')
       .then(response => response.json())
@@ -688,7 +686,7 @@ document.addEventListener('DOMContentLoaded', e => {
             results.push({
               "username": userImage.user.username,
               "moves": userImage.moves
-            })
+            });
           }
         }
         const sortedResults = results.sort(function (a, b) {
@@ -696,18 +694,16 @@ document.addEventListener('DOMContentLoaded', e => {
         });
         const leaderboard = document.querySelector('#ul-tbody')
         for (let i = 0; i < sortedResults.length; i++) {
-          const row = document.createElement('tr')
+          const row = document.createElement('tr');
           row.innerHTML = `
           <th scope="row">${i + 1}</th>
           <td>${sortedResults[i].username}</td>              
           <td>${sortedResults[i].moves}</td>
-        `
+        `;
           leaderboard.append(row);
         }
-      })
-  }
+      });
+  };
 
   clickHandler();
-
 });
-
