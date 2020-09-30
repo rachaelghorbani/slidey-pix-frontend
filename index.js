@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', e => {
   const contentDiv = document.querySelector('#content');
+  
   let userId;
   const headers = {
     "Content-Type": "application/json",
@@ -244,14 +245,17 @@ document.addEventListener('DOMContentLoaded', e => {
     galleryContainer.id = `${idName}`
 
     const galleryHead = document.createElement('h1');
-    galleryHead.className = "font-weight-light text-center text-lg-left mt-4 mb-0";
+    galleryHead.className = "font-weight-light text-center mt-4 mb-0";
     galleryHead.textContent = `${headerTextContent}`;
+   
 
     const galleryHr = document.createElement('hr');
     galleryHr.className = "mt-2 mb-5";
 
     const thumbnailDiv = document.createElement('div');
-    thumbnailDiv.className = "row text-center text-lg-left";
+    
+    thumbnailDiv.className = "row text-center text-lg-left justify-content-center";
+    
     thumbnailDiv.id = "thumbnails";
 
     galleryContainer.append(galleryHead);

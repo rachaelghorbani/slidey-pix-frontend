@@ -153,3 +153,7 @@ ul ul a {
 .color-silver {
   background: #d7d6d6;
 }
+
+.border-none {
+    border: #ff334e;
+}
