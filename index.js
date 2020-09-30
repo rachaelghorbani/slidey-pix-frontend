@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', e => {
       `;
 
       document.querySelector('#thumbnails').append(newDiv);
-      if (document.querySelector('.solved-container')) {
+      if (document.querySelector('h1').textContent === "Completed Puzzles") {
         const thumbDiv = document.querySelector('#thumbnails').lastElementChild;
         const movesP = document.createElement('p');
         movesP.textContent = `Completed in ${moves} moves!`;
@@ -536,20 +536,10 @@ document.addEventListener('DOMContentLoaded', e => {
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const newDiv = document.createElement('div');
-    const scrambleButton = document.createElement('button')
-    scrambleButton.id = "scramble"
-    scrambleButton.textContent = "Scramble!"
-    const movesContainer = document.createElement('p')
-    movesContainer.id = "moves-container"
-    movesContainer.innerHTML = `
-        Moves: <span id="moves-counter">0</span>
-    `
-    newDiv.append(scrambleButton)
-    newDiv.append(movesContainer)
-    // newDiv.innerHTML = `
-    //   <button id="scramble">Scramble!</button>
-    //   <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
-    // `;
+    newDiv.innerHTML = `
+      <button id="scramble">Scramble!</button>
+      <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
+    `;
     const gridContainer = document.querySelector('.grid-container');
 
     contentDiv.insertBefore(newDiv, gridContainer);
@@ -670,6 +660,7 @@ document.addEventListener('DOMContentLoaded', e => {
         });
 
         const leaderboard = document.querySelector('#modal-tbody');
+        removeChildren(leaderboard)
 
         for (let i = 0; i < sortedResults.length; i++) {
           const row = document.createElement('tr');
