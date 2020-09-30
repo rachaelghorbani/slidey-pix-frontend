@@ -597,8 +597,6 @@ document.addEventListener('DOMContentLoaded', e => {
       imagePieces[parseInt(piece.parentElement.id.split("-")[1], 10)] = piece;
       imagePieces[15] = ''
     }
-    console.log(scramblePos)
-    console.log(imagePieces)
 
     for (let position in scramblePos) {
       const positionDiv = document.getElementById(`${position}`);
@@ -609,6 +607,15 @@ document.addEventListener('DOMContentLoaded', e => {
       tile.append(imagePieces[scramblePos[position]]);
       positionDiv.append(tile)
     }
+
+    // for (let i = 0; i < 100; i++) {
+    //   let emptyPosIndex = findEmptyTilePosition();
+    //   let moveablePositions = moveableTilePositions(emptyPosIndex);
+    //   let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
+    //   let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
+
+    //   swapTiles(tileToMove);
+    // }
   };
 
   const isSolved = () => {

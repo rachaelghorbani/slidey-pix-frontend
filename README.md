@@ -10,4 +10,5 @@
 * after solving puzzle, modal leaderboard very screwy -- solved!
 * after solving puzzle, can't click on most of sidebar -- solved!
 
-* specific scrambles for each image
+* specific scrambles for each image -- DONE
+* custom grid size
