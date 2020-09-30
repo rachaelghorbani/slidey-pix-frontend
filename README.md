@@ -8,6 +8,6 @@
 
 // TODOS
 * after solving puzzle, modal leaderboard very screwy
-* after solving puzzle, can't click on most of sidebar
+* after solving puzzle, can't click on most of sidebar -- solved!
 
 * specific scrambles for each image
