@@ -308,8 +308,10 @@ document.addEventListener('DOMContentLoaded', e => {
       }
     })
     document.addEventListener('click', e => {
-     if (e.target.matches('.img-thumbnail')) {
-        
+      if (document.querySelector('.grid-container')) {
+            playPuzzle(e.target)
+      }
+      if (e.target.matches('.img-thumbnail')) {
             addPuzzleGrid()
             const imgId = e.target.dataset.imgId;
             renderSelectedImageAsPuzzle(imgId)
@@ -321,8 +323,6 @@ document.addEventListener('DOMContentLoaded', e => {
       } else if (e.target.matches('.puzzle-gallery')) {
             resetActiveNavBarElement(e.target)
             getImages();
-      } else if (document.querySelector('.grid-container')) {
-            playPuzzle(e.target)
       } else if (e.target.matches('#scramble')) {
           console.log(e.target)
          debugger
@@ -366,7 +366,6 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
   const logoutAndRerenderLoginForm = () => {
-
     userId = ''
     clearContent()
     const toHide = document.querySelectorAll('.hide-until-login')
