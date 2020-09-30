@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', e => {
-   
   const contentDiv = document.querySelector('#content');
   let userId;
   const headers = {
     "Content-Type": "application/json",
     "Accept": "application/json",
   }
-
+  let scramblePos = {}
+  
   const squareImg = (id, img_url, moves) => {
     const origCanvas = document.createElement('canvas');
     const origCtx = origCanvas.getContext('2d');
@@ -528,9 +528,11 @@ document.addEventListener('DOMContentLoaded', e => {
     fetch('http://localhost:3000/user_images/', options)
       .then(response => response.json())
       .then(json => {
+        scramblePos = json.image.scramble_pos
         renderPuzzle(json.id, json.image.img_url);
           
       })
+      
   }
 
 
@@ -550,7 +552,7 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const findEmptyTilePosition = () => {
-    return parseInt(document.querySelector('#tile-15').parentElement.id, 10);
+    return parseInt(document.getElementById('tile-15').parentElement.id, 10);
   };
 
   const moveableTilePositions = (emptyPosIndex) => {
@@ -590,13 +592,22 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const scrambleTiles = () => {
-    for (let i = 0; i < 100; i++) {
-      let emptyPosIndex = findEmptyTilePosition();
-      let moveablePositions = moveableTilePositions(emptyPosIndex);
-      let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
-      let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
+    let imagePieces = [];
+    for (let piece of document.querySelectorAll('img')) {
+      imagePieces[parseInt(piece.parentElement.id.split("-")[1], 10)] = piece;
+      imagePieces[15] = ''
+    }
+    console.log(scramblePos)
+    console.log(imagePieces)
 
-      swapTiles(tileToMove);
+    for (let position in scramblePos) {
+      const positionDiv = document.getElementById(`${position}`);
+      removeChildren(positionDiv);
+      const tile = document.createElement(`div`);
+      tile.className = 'tile';
+      tile.id = `tile-${scramblePos[position]}`;
+      tile.append(imagePieces[scramblePos[position]]);
+      positionDiv.append(tile)
     }
   };
 
