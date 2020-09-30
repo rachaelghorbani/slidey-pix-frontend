@@ -324,10 +324,6 @@ document.addEventListener('DOMContentLoaded', e => {
             resetActiveNavBarElement(e.target)
             getImages();
       } else if (e.target.matches('#scramble')) {
-          console.log(e.target)
-         debugger
-        const movesCounter = document.querySelector('#moves-container')
-        
         const imageGrid = document.querySelector('.grid-container')
         // imageGrid.style.pointerEvents = 'auto'
         // movesCounter.hidden = false
