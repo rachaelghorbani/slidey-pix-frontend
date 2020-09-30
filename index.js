@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', e => {
+   
   const contentDiv = document.querySelector('#content');
   let userId;
   const headers = {
@@ -234,15 +235,16 @@ document.addEventListener('DOMContentLoaded', e => {
     }
   };
 
-  const getImages = (category) => {
+  const createGallery = (headerTextContent, idName) => {
     clearContent();
 
     const galleryContainer = document.createElement('div');
     galleryContainer.className = "gallery-container";
+    galleryContainer.id = `${idName}`
 
     const galleryHead = document.createElement('h1');
     galleryHead.className = "font-weight-light text-center text-lg-left mt-4 mb-0";
-    galleryHead.textContent = "Puzzle Gallery";
+    galleryHead.textContent = `${headerTextContent}`;
 
     const galleryHr = document.createElement('hr');
     galleryHr.className = "mt-2 mb-5";
@@ -255,7 +257,13 @@ document.addEventListener('DOMContentLoaded', e => {
     galleryContainer.append(galleryHr);
     galleryContainer.append(thumbnailDiv);
 
+    
     contentDiv.append(galleryContainer);
+  }
+
+  const getImages = (category) => {
+    createGallery("Puzzle Gallery", "puzzle-gallery-container")
+
 
     fetch('http://localhost:3000/images')
       .then(resp => resp.json())
@@ -291,208 +299,201 @@ document.addEventListener('DOMContentLoaded', e => {
   const clickHandler = () => {
     document.addEventListener('submit', e => {
       e.preventDefault();
-
       if (e.target.matches('#login')) {
-        const username = e.target.username.value;
-
-        const userObj = {
-          username: username
-        };
-
-        const options = {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(userObj)
-        };
-
-        fetch('http://localhost:3000/users', options)
-          .then(resp => resp.json())
-          .then(json => login(json));
-
+            findOrCreateUserOnLoginAndRenderPuzzleGallery(e.target)
       } else if (e.target.matches('#add-image')) {
-        clearContent();
-        fetch('http://localhost:3000/categories')
-          .then(resp => resp.json())
-          .then(json => {
-            let categoryId;
-
-            for (let category of json) {
-              if (category.name === "my custom puzzles") {
-                categoryId = category.id;
-              }
-            }
-
-            const form = e.target;
-
-            const imgObj = {
-              img_url: form.img_url.value,
-              user_id: userId,
-              category_id: categoryId
-            };
-
-            const options = {
-              method: "POST",
-              headers: headers,
-              body: JSON.stringify(imgObj)
-            };
-
-            fetch("http://localhost:3000/images", options)
-              .then(response => response.json())
-              .then(json => {
-                addPuzzleGrid();
-                renderSelectedImageAsPuzzle(json.id);
-              });
-          });
-      }
-    });
-
-    document.addEventListener('click', e => {
-      if (document.querySelector('.grid-container')) {
-        let emptyPosIndex = findEmptyTilePosition();
-        let moveablePositions = moveableTilePositions(emptyPosIndex);
-
-        if (moveablePositions.includes(parseInt(e.target.parentElement.parentElement.id, 10))) {
-          const movesCounter = document.querySelector('#moves-counter');
-          movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
-          swapTiles(e.target.parentElement);
-          isSolved();
-        }
-      }
-      if (e.target.matches('#showPuzzle')) {
-        const showPuzzleButton = document.querySelector('#showPuzzle');
-        showPuzzleButton.hidden = true;
-        const scramblePuzzleButton = document.querySelector('#scramble');
-        scramblePuzzleButton.hidden = false;
-        const gridContainer = document.querySelector('.grid-container');
-        gridContainer.hidden = false;
-
-      } else if (e.target.matches('.img-thumbnail')) {
-        addPuzzleGrid();
-        const imgId = e.target.dataset.imgId;
-        renderSelectedImageAsPuzzle(imgId);
-      } else if (e.target.matches('.completed-puzzles')) {
-        clearContent();
-        const solvedContainer = document.createElement('div');
-        solvedContainer.className = "solved-container";
-        solvedContainer.id = "user-solved-puzzle-container";
-
-        const galleryHead = document.createElement('h1');
-        galleryHead.className = "font-weight-light text-center text-lg-left mt-4 mb-0";
-        galleryHead.textContent = "Completed Puzzles";
-
-        const galleryHr = document.createElement('hr');
-        galleryHr.className = "mt-2 mb-5";
-
-        const thumbnailDiv = document.createElement('div');
-        thumbnailDiv.className = "row text-center text-lg-left";
-        thumbnailDiv.id = "thumbnails";
-
-        solvedContainer.append(galleryHead);
-        solvedContainer.append(galleryHr);
-        solvedContainer.append(thumbnailDiv);
-
-        contentDiv.append(solvedContainer);
-
-        resetActiveNavBarElement(e.target);
-        const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container');
-        userCompletedPuzzles.hidden = false;
-
-
-        const solvedPuzzleMovesAndId = [];
-        fetch(`http://localhost:3000/users/${userId}`)
-          .then(response => response.json())
-          .then(user => {
-            for (let userImage of user.user_images) {
-              if (userImage.completed === true) {
-                const puzzleIdAndMoves = {};
-                puzzleIdAndMoves.image_id = userImage.image_id;
-                puzzleIdAndMoves.moves = userImage.moves;
-                solvedPuzzleMovesAndId.push(puzzleIdAndMoves);
-              }
-            }
-            const solvedPuzzles = [];
-            //for all of a users images, see if they match and if so get the pic url
-            for (let puzzleHash of solvedPuzzleMovesAndId) {
-              for (let image of user.images) {
-                if (image.id === puzzleHash.image_id) {
-                  puzzleHash.img_url = image.img_url;
-                  solvedPuzzles.push(puzzleHash);
-                }
-              }
-            }
-            for (let puzzle of solvedPuzzles) {
-              squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves);
-            }
-          });
-
-      } else if (e.target.matches('.puzzle-gallery')) {
-        resetActiveNavBarElement(e.target);
-        getImages();
-      } else if (e.target.matches('#scramble')) {
-        const movesCounter = document.querySelector('#moves-container');
-        const imageGrid = document.querySelector('.grid-container');
-
-        imageGrid.style.pointerEvents = 'auto';
-        // movesCounter.hidden = false;
-        scrambleTiles();
-      } else if (e.target.matches('.create-puzzle')) {
-        clearContent();
-        resetActiveNavBarElement(e.target);
-
-        const form = document.createElement('form');
-        form.id = "add-image";
-        const formDiv = document.createElement('div');
-        formDiv.className = "form-group";
-        const imgLabel = document.createElement('label');
-        imgLabel.textContent = "Image URL: ";
-        imgLabel.for = "img_url";
-        const submitButton = document.createElement('button');
-        submitButton.textContent = "Create Puzzle!";
-        submitButton.type = 'submit';
-
-        const imgInput = document.createElement('input');
-        imgInput.className = "form-control";
-        imgInput.type = "text";
-        imgInput.name = "img_url";
-
-        formDiv.append(imgLabel);
-        formDiv.append(imgInput);
-        form.append(formDiv);
-        form.append(submitButton);
-        contentDiv.append(form);
-      } else if (e.target.matches('.logout')) {
-
-        userId = '';
-        clearContent();
-        const toHide = document.querySelectorAll('.hide-until-login');
-        
-        for (let nav of toHide) {
-          nav.hidden = true;
-        }
-
-        const loginNav = document.querySelector('#login-nav');
-        loginNav.hidden = false;
-
-        const formDiv = document.createElement('div');
-        formDiv.innerHTML = `
-          <form id="login">
-          <label for="username">Username:</label>        
-          <input type="textfield" name="username" value=""><br>
-          <button type="submit" id="play">Play!</button>
-          </form>
-        `;
-        contentDiv.append(formDiv);
-      } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
-        resetActiveNavBarElement(e.target);
-        getImages(e.target.textContent);
+            addNewImage(e.target)
       }
     })
+    document.addEventListener('click', e => {
+      if (document.querySelector('.grid-container')) {
+            playPuzzle(e.target)
+      }
+      if (e.target.matches('.img-thumbnail')) {
+            addPuzzleGrid()
+            const imgId = e.target.dataset.imgId;
+            renderSelectedImageAsPuzzle(imgId)
+            const gridContainer = document.querySelector('.grid-container')
+            // gridContainer.style.pointerEvents = 'none'
+            
+      } else if (e.target.matches('.completed-puzzles')) {
+            getAndDisplayCompletedPuzzles(e.target)
+      } else if (e.target.matches('.puzzle-gallery')) {
+            resetActiveNavBarElement(e.target)
+            getImages();
+      } else if (e.target.matches('#scramble')) {
+        const imageGrid = document.querySelector('.grid-container')
+        // imageGrid.style.pointerEvents = 'auto'
+        // movesCounter.hidden = false
+        scrambleTiles();
+      } else if (e.target.matches('.create-puzzle')) {
+            renderFormToCreateNewPuzzle(e.target)
+      } else if (e.target.matches('.logout')) {
+            logoutAndRerenderLoginForm()
+      } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
+            resetActiveNavBarElement(e.target)
+            getImages(e.target.textContent)
+      }
+    })
+
+
 
     $('#exampleModal').on('hide.bs.modal', e => {
       const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
       renderLeaderboard(imgId);
+      const imageGrid = document.querySelector('.grid-container')
+    //    imageGrid.style.pointerEvents = 'none'
+     
     })
-  };
+  }
+
+  const playPuzzle = el => {
+    let emptyPosIndex = findEmptyTilePosition();
+    let moveablePositions = moveableTilePositions(emptyPosIndex);
+
+    if (moveablePositions.includes(parseInt(el.parentElement.parentElement.id, 10))) {
+      const movesCounter = document.querySelector('#moves-counter')
+      movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
+      swapTiles(el.parentElement);
+      isSolved()
+    }
+  }
+
+  const logoutAndRerenderLoginForm = () => {
+    userId = ''
+    clearContent()
+    const toHide = document.querySelectorAll('.hide-until-login')
+    for (let nav of toHide) {
+      nav.hidden = true
+    }
+    const loginNav = document.querySelector('#login-nav')
+    loginNav.hidden = false;
+
+    const formDiv = document.createElement('div')
+    formDiv.innerHTML = `
+      <form id="login">
+      <label for="username">Username:</label>        
+      <input type="textfield" name="username" value=""><br>
+      <button type="submit" id="play">Play!</button>
+      </form>
+    `
+    contentDiv.append(formDiv)
+  }
+
+  const renderFormToCreateNewPuzzle = el => {
+    clearContent()
+    resetActiveNavBarElement(el)
+
+    const form = document.createElement('form')
+    form.id = "add-image"
+    const formDiv = document.createElement('div')
+    formDiv.className = "form-group"
+    const imgLabel = document.createElement('label')
+    imgLabel.textContent = "Image URL: "
+    imgLabel.for = "img_url"
+    const submitButton = document.createElement('button')
+    submitButton.textContent = "Create Puzzle!"
+    submitButton.type = 'submit'
+
+
+    const imgInput = document.createElement('input')
+    imgInput.className = "form-control"
+    imgInput.type = "text"
+    imgInput.name = "img_url"
+
+    formDiv.append(imgLabel)
+    formDiv.append(imgInput)
+    form.append(formDiv)
+    form.append(submitButton)
+    contentDiv.append(form)
+  }
+
+  const getAndDisplayCompletedPuzzles = el => {
+    createGallery("Completed Puzzles","user-solved-puzzle-container" )
+
+    resetActiveNavBarElement(el)
+    const userCompletedPuzzles = document.querySelector('#user-solved-puzzle-container')
+    userCompletedPuzzles.hidden = false
+
+
+    const solvedPuzzleMovesAndId = []
+    fetch(`http://localhost:3000/users/${userId}`)
+      .then(response => response.json())
+      .then(user => {
+        for (let userImage of user.user_images) {
+          if (userImage.completed === true) {
+            const puzzleIdAndMoves = {}
+            puzzleIdAndMoves.image_id = userImage.image_id
+            puzzleIdAndMoves.moves = userImage.moves
+            solvedPuzzleMovesAndId.push(puzzleIdAndMoves)
+          }
+        }
+        const solvedPuzzles = []
+        for (let puzzleHash of solvedPuzzleMovesAndId) {
+          for (let image of user.images) {
+            if (image.id === puzzleHash.image_id) {
+              puzzleHash.img_url = image.img_url
+              solvedPuzzles.push(puzzleHash)
+            }
+          }
+        }
+        for (let puzzle of solvedPuzzles) {
+          squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves)
+        }
+      })
+  }
+
+  const findOrCreateUserOnLoginAndRenderPuzzleGallery = el => {
+    const username = el.username.value
+
+    const userObj = {
+      username: username
+    }
+
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(userObj)
+    }
+
+    fetch('http://localhost:3000/users', options)
+      .then(resp => resp.json())
+      .then(json => login(json))
+  }
+
+  const addNewImage = el => {
+    clearContent()
+    fetch('http://localhost:3000/categories')
+      .then(resp => resp.json())
+      .then(json => {
+        let categoryId;
+        for (let category of json) {
+          if (category.name === "my custom puzzles") {
+            categoryId = category.id;
+          }
+        }
+        const form = el
+
+        const imgObj = {
+          img_url: form.img_url.value,
+          user_id: userId,
+          category_id: categoryId
+        }
+
+        const options = {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(imgObj)
+        }
+
+        fetch("http://localhost:3000/images", options)
+          .then(response => response.json())
+          .then(json => {
+            addPuzzleGrid();
+            renderSelectedImageAsPuzzle(json.id)
+          })
+      })
+  }
 
   const resetActiveNavBarElement = el => {
     const navElements = document.querySelectorAll('.nav-link');
@@ -505,9 +506,11 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const renderSelectedImageAsPuzzle = imgId => {
-    const imageGrid = document.querySelector('.grid-container');
-    imageGrid.dataset.imgId = imgId;
-    const leaderboard = document.querySelector('.leaderboard-container');
+
+   
+    const imageGrid = document.querySelector('.grid-container')
+    imageGrid.dataset.imgId = imgId
+    const leaderboard = document.querySelector('.leaderboard-container')
     renderLeaderboard(imgId);
     leaderboard.hidden = false;
 
@@ -526,21 +529,34 @@ document.addEventListener('DOMContentLoaded', e => {
       .then(response => response.json())
       .then(json => {
         renderPuzzle(json.id, json.image.img_url);
-      });
-  };
+          
+      })
+  }
+
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const newDiv = document.createElement('div');
-    newDiv.innerHTML = `
-      <button id="scramble">Scramble!</button>
-      <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
-    `;
+    const scrambleButton = document.createElement('button')
+    scrambleButton.id = "scramble"
+    scrambleButton.textContent = "Scramble!"
+    const movesContainer = document.createElement('p')
+    movesContainer.id = "moves-container"
+    movesContainer.innerHTML = `
+        Moves: <span id="moves-counter">0</span>
+    `
+    newDiv.append(scrambleButton)
+    newDiv.append(movesContainer)
+    // newDiv.innerHTML = `
+    //   <button id="scramble">Scramble!</button>
+    //   <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
+    // `;
     const gridContainer = document.querySelector('.grid-container');
 
     contentDiv.insertBefore(newDiv, gridContainer);
     gridContainer.dataset.userImageId = userImageId;
-
-    cropImage(puzzleUrl);
+    
+    cropImage(puzzleUrl)
+    
   };
 
   const findEmptyTilePosition = () => {
@@ -633,7 +649,6 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 
   const endOfGame = () => {
-    const modalBody = document.querySelector(".modal-body");
     const imgId = document.querySelector('.grid-container').dataset.imgId;
 
     fetch('http://localhost:3000/user_images')
@@ -669,8 +684,6 @@ document.addEventListener('DOMContentLoaded', e => {
 
     const modalButton = document.querySelector('#show-modal');
     modalButton.click();
-    const imageGrid = document.querySelector('.grid-container');
-    imageGrid.style.pointerEvents = 'none';
   }
 
   const renderLeaderboard = imgId => {
