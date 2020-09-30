@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', e => {
+   
   const contentDiv = document.querySelector('#content');
   let userId;
   const headers = {
@@ -308,9 +309,13 @@ document.addEventListener('DOMContentLoaded', e => {
     })
     document.addEventListener('click', e => {
      if (e.target.matches('.img-thumbnail')) {
-            addPuzzleGrid();
+        
+            addPuzzleGrid()
             const imgId = e.target.dataset.imgId;
             renderSelectedImageAsPuzzle(imgId)
+            const gridContainer = document.querySelector('.grid-container')
+            // gridContainer.style.pointerEvents = 'none'
+            
       } else if (e.target.matches('.completed-puzzles')) {
             getAndDisplayCompletedPuzzles(e.target)
       } else if (e.target.matches('.puzzle-gallery')) {
@@ -318,22 +323,22 @@ document.addEventListener('DOMContentLoaded', e => {
             getImages();
       } else if (document.querySelector('.grid-container')) {
             playPuzzle(e.target)
-      } else if (e.target.matches("#scramble")) {
+      } else if (e.target.matches('#scramble')) {
           console.log(e.target)
-         
-        // const movesCounter = document.querySelector('#moves-container')
+         debugger
+        const movesCounter = document.querySelector('#moves-container')
+        
         const imageGrid = document.querySelector('.grid-container')
-
         // imageGrid.style.pointerEvents = 'auto'
         // movesCounter.hidden = false
         scrambleTiles();
       } else if (e.target.matches('.create-puzzle')) {
-        renderFormToCreateNewPuzzle(e.target)
+            renderFormToCreateNewPuzzle(e.target)
       } else if (e.target.matches('.logout')) {
-        logoutAndRerenderLoginForm()
+            logoutAndRerenderLoginForm()
       } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
-        resetActiveNavBarElement(e.target)
-        getImages(e.target.textContent)
+            resetActiveNavBarElement(e.target)
+            getImages(e.target.textContent)
       }
     })
 
@@ -342,6 +347,9 @@ document.addEventListener('DOMContentLoaded', e => {
     $('#exampleModal').on('hide.bs.modal', e => {
       const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
       renderLeaderboard(imgId);
+      const imageGrid = document.querySelector('.grid-container')
+    //    imageGrid.style.pointerEvents = 'none'
+     
     })
   }
 
@@ -506,6 +514,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
   const renderSelectedImageAsPuzzle = imgId => {
 
+   
     const imageGrid = document.querySelector('.grid-container')
     imageGrid.dataset.imgId = imgId
     const leaderboard = document.querySelector('.leaderboard-container')
@@ -527,22 +536,34 @@ document.addEventListener('DOMContentLoaded', e => {
       .then(response => response.json())
       .then(json => {
         renderPuzzle(json.id, json.image.img_url);
+          
       })
   }
 
 
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const newDiv = document.createElement('div');
-    newDiv.innerHTML = `
-      <button id="scramble">Scramble!</button>
-      <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
-    `;
+    const scrambleButton = document.createElement('button')
+    scrambleButton.id = "scramble"
+    scrambleButton.textContent = "Scramble!"
+    const movesContainer = document.createElement('p')
+    movesContainer.id = "moves-container"
+    movesContainer.innerHTML = `
+        Moves: <span id="moves-counter">0</span>
+    `
+    newDiv.append(scrambleButton)
+    newDiv.append(movesContainer)
+    // newDiv.innerHTML = `
+    //   <button id="scramble">Scramble!</button>
+    //   <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
+    // `;
     const gridContainer = document.querySelector('.grid-container');
 
     contentDiv.insertBefore(newDiv, gridContainer);
     gridContainer.dataset.userImageId = userImageId;
-
+    
     cropImage(puzzleUrl)
+    
   };
 
   const findEmptyTilePosition = () => {
@@ -666,8 +687,6 @@ document.addEventListener('DOMContentLoaded', e => {
 
     const modalButton = document.querySelector('#show-modal');
     modalButton.click();
-  
-    // imageGrid.style.pointerEvents = 'none'
   }
 
   const renderLeaderboard = imgId => {
