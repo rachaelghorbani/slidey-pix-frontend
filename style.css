@@ -105,10 +105,18 @@ ul ul a {
 
 .grid-container {
   display: grid;
+  width: 75vw;
   grid-template-columns: 20vh 20vh 20vh 20vh;
   grid-template-rows: 20vh 20vh 20vh 20vh;
   padding: 10px;
-  
+  justify-content: center;
+}
+
+#game-info {
+  display: grid;
+  width: 75vw;
+  justify-content: center;
+  align-items: center;
 }
 
 .grid-item {
@@ -134,6 +142,10 @@ ul ul a {
   color: #f9f5ff
 }
 
+.color-pink {
+  background: #f9f5ff;
+}
+
 .color-rose {
   background: #ff5d73;
 }
@@ -155,5 +167,7 @@ ul ul a {
 }
 
 .border-none {
-    border: #ff334e;
+    border: none;
 }
+
+

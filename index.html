@@ -24,17 +24,17 @@
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" show="false">
   <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Congratulations, you solved the puzzle!</h5>
+    <div class="modal-content color-pink">
+      <div class="modal-header ">
+        <h5 class="modal-title text-blue" id="exampleModalLabel">Congratulations, you solved the puzzle!</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
          <div class="modal-leaderboard-container">
-          <h3 class="center">Leaderboard</h3>
-          <table class="table">
+          <h3 class="center text-blue">Leaderboard</h3>
+          <table class="table text-blue">
             <thead>
               <tr>
                <th scope="col">Rank</th>
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary color-rose" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary color-rose border-none" data-dismiss="modal">Close</button>
        </div>
     </div>
   </div>
@@ -73,16 +73,16 @@
             <a href="#categorySubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">Categories</a>
             <ul class="collapse list-unstyled" id="categorySubmenu">
               <li>
-                <a href="#">Animals</a>
+                <a href="#" class="nav-link">Animals</a>
               </li>
               <li>
-                <a href="#">Cities</a>
+                <a href="#" class="nav-link">Cities</a>
               </li>
               <li>
-                <a href="#">Nature</a>
+                <a href="#" class="nav-link">Nature</a>
               </li>
               <li>
-                <a href="#">My Custom Puzzles</a>
+                <a href="#" class="nav-link">My Custom Puzzles</a>
               </li>
             </ul>
           </li>
@@ -98,7 +98,7 @@
         </ul>
         <div class="leaderboard-container" hidden="true">
           <h3 class="center">Leaderboard</h3>
-          <table class="table">
+          <table class="table text-blue">
             <thead>
               <tr>
                <th scope="col">Rank</th>
@@ -112,7 +112,7 @@
           </table>       
         </div>
       </nav>
-      <div id="content">
+      <div id="content-container">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
             <button type="button" id="sidebarCollapse" class="btn btn-info color-rose border-none">
@@ -120,20 +120,22 @@
             </button>
           </div>
         </nav>
-        <div class="container h-100">
-          <div class="jumbotron justify-content-center ml-5">
-            <h1 class="display-3 mb-5 text-blue">Welcome to Slidey Pix!</h1>
-            <div class="row justify-content-center">
-              <div class="mx-auto">
-            
-                <form class="form-inline" id="login">
-                  <div class="form-group mb-2">
-                    <label for="username" class="form-label mr-3 text-blue">Username:</label>        
-                    <input type="text" class="form-control" name="username" value="">
-                  
-                  <button type="submit" class="border-none btn btn-info ml-3 btn-lg color-rose" id="play">Play!</button>
-                  </div>
-                </form>
+        <div id="content" class="mx-auto">
+          <div class="container h-100">
+            <div class="jumbotron justify-content-center ml-5">
+              <h1 class="display-3 mb-5 text-blue">Welcome to Slidey Pix!</h1>
+              <div class="row justify-content-center">
+                <div class="mx-auto">
+              
+                  <form class="form-inline" id="login">
+                    <div class="form-group mb-2">
+                      <label for="username" class="form-label mr-3 text-blue">Username:</label>        
+                      <input type="text" class="form-control" name="username" value="">
+                    
+                    <button type="submit" class="border-none btn btn-info ml-3 btn-lg color-rose" id="play">Play!</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
