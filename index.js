@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', e => {
       if (document.querySelector('h1').textContent === "Completed Puzzles") {
         const thumbDiv = document.querySelector('#thumbnails').lastElementChild;
         const movesP = document.createElement('p');
+        movesP.className = 'text-blue';
         movesP.textContent = `Completed in ${moves} moves!`;
         thumbDiv.firstElementChild.append(movesP);
       }
@@ -539,7 +540,7 @@ document.addEventListener('DOMContentLoaded', e => {
   const renderPuzzle = (userImageId, puzzleUrl) => {
     const newDiv = document.createElement('div');
     newDiv.innerHTML = `
-      <button id="scramble">Scramble!</button>
+      <button id="scramble" class="btn btn-info color-rose">Scramble!</button>
       <p id="moves-container">Moves: <span id="moves-counter">0</span></p>
     `;
     const gridContainer = document.querySelector('.grid-container');

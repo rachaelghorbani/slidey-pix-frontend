@@ -1,3 +1,4 @@
+
 .wrapper {
   display: flex;
   width: 100%;
@@ -33,7 +34,7 @@ a[data-toggle="collapse"] {
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #fafafa;
+    background: #f9f5ff;
 }
 
 p {
@@ -41,7 +42,7 @@ p {
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
-    color: #999;
+    color: #f9f5ff;
 }
 
 a, a:hover, a:focus {
@@ -56,23 +57,23 @@ a, a:hover, a:focus {
     max-width: 250px;
     min-height: 100vh;
     /* don't forget to add all the previously mentioned styles here too */
-    background: #7386D5;
-    color: #fff;
+    background: #5bc0de;
+    color: #f9f5ff;
     transition: all 0.3s;
 }
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
+    background: #5bc0de;
 }
 
 #sidebar ul.components {
     padding: 20px 0;
-    border-bottom: 1px solid #47748b;
+    border-bottom: 1px solid #5bc0de;
 }
 
 #sidebar ul p {
-    color: #fff;
+    color: #f9f5ff;
     padding: 10px;
 }
 
@@ -82,18 +83,18 @@ a, a:hover, a:focus {
     display: block;
 }
 #sidebar ul li a:hover {
-    color: #7386D5;
-    background: #fff;
+    color: #2698ba;
+    background: #f9f5ff;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
+    color: #f9f5ff;
+    background: #2698ba;
 }
 ul ul a {
     font-size: 0.9em !important;
     padding-left: 30px !important;
-    background: #6d7fcc;
+    background: #5bc0de;
 }
 
 .center {
@@ -111,8 +112,8 @@ ul ul a {
 }
 
 .grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  background-color: #f9f5ff;
+  border: 1px solid #1d263b;
   font-size: 30px;
   text-align: center;
 }
@@ -125,3 +126,30 @@ ul ul a {
   padding-left: 20px;
 }
 
+.text-blue {
+  color: #1d263b;
+}
+
+.text-pink {
+  color: #f9f5ff
+}
+
+.color-rose {
+  background: #ff5d73;
+}
+
+.color-rose:hover {
+  background: #ff334e; 
+}
+
+.color-teal {
+  background: #5bc0de;
+}
+
+.color-teal:hover {
+  background: #2698ba;
+}
+
+.color-silver {
+  background: #d7d6d6;
+}
