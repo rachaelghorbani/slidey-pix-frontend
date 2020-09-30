@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', e => {
   }
   let scramblePos = {}
 
-  const squareImg = (id, img_url, moves) => {
+  const squareImg = (id, img_url, moves, completed) => {
     const origCanvas = document.createElement('canvas');
     const origCtx = origCanvas.getContext('2d');
     // create the Image object we'll be using the canvas methods on
@@ -59,12 +59,20 @@ document.addEventListener('DOMContentLoaded', e => {
       newDiv.class = "col-lg-3 col-md-4 col-6";
       newDiv.style = "position: relative; text-align: center; color: white;"
 
-      newDiv.innerHTML = `
-        <a href="#" class="d-block mb-4 h-100">
-          <img class="img-fluid img-thumbnail" style="opacity: 0.5;" data-img-id=${id} src=${origCanvas.toDataURL()}>
-          <p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">completed</p>
-        </a>
-      `;
+      if (completed === true) {
+        newDiv.innerHTML = `
+          <a href="#" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" style="opacity: 0.5;" data-img-id=${id} src=${origCanvas.toDataURL()}>
+            <p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">completed</p>
+          </a>
+        `;
+      } else {
+        newDiv.innerHTML = `
+          <a href="#" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
+          </a>
+        `;
+      }
 
       document.querySelector('#thumbnails').append(newDiv);
       if (document.querySelector('h1').textContent === "Completed Puzzles") {
@@ -296,11 +304,24 @@ document.addEventListener('DOMContentLoaded', e => {
     let flag = false;
     for (let user of image.users) {
       if (user.id === userId) {
-        // flag = true;
+        flag = true;
       }
     }
     if (flag === false) {
       squareImg(image.id, image.img_url);
+    } else {
+      let userCompleted = false;
+      fetch('http://localhost:3000/user_images')
+      .then(resp => resp.json())
+      .then(json => {
+        for (let userImage of json) {
+          if (userImage.user_id == userId && userImage.image_id == image.id && userImage.completed == true) {
+            userCompleted = true;
+          }
+        }
+        squareImg(image.id, image.img_url, 0, userCompleted)
+      })
+            
     }
   }
 

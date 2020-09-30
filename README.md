@@ -12,3 +12,7 @@
 
 * specific scrambles for each image -- DONE
 * custom grid size
+
+
+// thursday todos
+* probably don't need a leaderboard for custom puzzles
