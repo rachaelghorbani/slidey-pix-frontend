@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const cropImage = (imgUrl, gridSize) => {
-
     // take original image and make it square:
 
     // create a temp canvas for the square image
@@ -156,16 +155,22 @@ document.addEventListener('DOMContentLoaded', e => {
         let i = 0;
         // nested loops go through the cells of the grid we're chopping into
         // starts at top left, moves down the column, then to the next column etc
-        for (let x = 0; x < 4; ++x) {
-          for (let y = 0; y < 4; ++y) {
+        for (let x = 0; x < gridSize; ++x) {
+          for (let y = 0; y < gridSize; ++y) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
             const nh = imgObj.naturalHeight;
 
-            canvas.height = window.innerHeight / 5;
+            if (gridSize == 4) {
+              canvas.height = window.innerHeight * .20;
+            } else if (gridSize == 3) {
+              canvas.height = window.innerHeight * .27;
+            } else if (gridSize == 5) {
+              canvas.height = window.innerHeight * .16;
+            }
             canvas.width = canvas.height;
-            const heightOfOnePiece = nh / 4;
+            const heightOfOnePiece = nh / gridSize;
             const widthOfOnePiece = heightOfOnePiece;
 
             ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width - 2, canvas.height - 2);
@@ -179,38 +184,89 @@ document.addEventListener('DOMContentLoaded', e => {
             i++;
           }
         }
-
-        const emptyTile = document.querySelector(`#tile-15`);
+        const emptyNum = gridSize * gridSize - 1;
+        const emptyTile = document.querySelector(`#tile-${emptyNum}`);
         emptyTile.innerHTML = '';
       }
     }
   }
 
-  const addPuzzleGrid = () => {
+  const addPuzzleGrid = (gridSize = 4) => {
     clearContent();
     const newDiv = document.createElement('div');
-    newDiv.className = 'grid-container';
-    newDiv.innerHTML = `
+    if (gridSize == 4) {
+      newDiv.className = 'grid-container grid-size-4';
+      newDiv.innerHTML = `
+        <div class="grid-item" id="0"><div class="tile" id="tile-0"></div></div>
+        <div class="grid-item" id="4"><div class="tile" id="tile-4"></div></div>
+        <div class="grid-item" id="8"><div class="tile" id="tile-8"></div></div>
+        <div class="grid-item" id="12"><div class="tile" id="tile-12"></div></div>
+
+        <div class="grid-item" id="1"><div class="tile" id="tile-1"></div></div>
+        <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
+        <div class="grid-item" id="9"><div class="tile" id="tile-9"></div></div>
+        <div class="grid-item" id="13"><div class="tile" id="tile-13"></div></div>
+
+        <div class="grid-item" id="2"><div class="tile" id="tile-2"></div></div>
+        <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
+        <div class="grid-item" id="10"><div class="tile" id="tile-10"></div></div>
+        <div class="grid-item" id="14"><div class="tile" id="tile-14"></div></div>
+
+        <div class="grid-item" id="3"><div class="tile" id="tile-3"></div></div>
+        <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
+        <div class="grid-item" id="11"><div class="tile" id="tile-11"></div></div>
+        <div class="grid-item" id="15"><div class="tile" id="tile-15"></div></div>
+      `;
+    } else if (gridSize == 3) {
+      newDiv.className = 'grid-container grid-size-3';
+      newDiv.innerHTML = `
       <div class="grid-item" id="0"><div class="tile" id="tile-0"></div></div>
+      <div class="grid-item" id="3"><div class="tile" id="tile-3"></div></div>
+      <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
+      
+      <div class="grid-item" id="1"><div class="tile" id="tile-1"></div></div>
       <div class="grid-item" id="4"><div class="tile" id="tile-4"></div></div>
+      <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
+    
+      <div class="grid-item" id="2"><div class="tile" id="tile-2"></div></div>
+      <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
       <div class="grid-item" id="8"><div class="tile" id="tile-8"></div></div>
-      <div class="grid-item" id="12"><div class="tile" id="tile-12"></div></div>
+      `;
+    } else if (gridSize == 5) {
+      newDiv.className = 'grid-container grid-size-5';
+
+      newDiv.innerHTML = `
+      <div class="grid-item" id="0"><div class="tile" id="tile-0"></div></div>
+      <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
+      <div class="grid-item" id="10"><div class="tile" id="tile-10"></div></div>
+      <div class="grid-item" id="15"><div class="tile" id="tile-15"></div></div>
+      <div class="grid-item" id="20"><div class="tile" id="tile-20"></div></div>
 
       <div class="grid-item" id="1"><div class="tile" id="tile-1"></div></div>
-      <div class="grid-item" id="5"><div class="tile" id="tile-5"></div></div>
-      <div class="grid-item" id="9"><div class="tile" id="tile-9"></div></div>
-      <div class="grid-item" id="13"><div class="tile" id="tile-13"></div></div>
+      <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
+      <div class="grid-item" id="11"><div class="tile" id="tile-11"></div></div>
+      <div class="grid-item" id="16"><div class="tile" id="tile-16"></div></div>
+      <div class="grid-item" id="21"><div class="tile" id="tile-21"></div></div>
 
       <div class="grid-item" id="2"><div class="tile" id="tile-2"></div></div>
-      <div class="grid-item" id="6"><div class="tile" id="tile-6"></div></div>
-      <div class="grid-item" id="10"><div class="tile" id="tile-10"></div></div>
-      <div class="grid-item" id="14"><div class="tile" id="tile-14"></div></div>
+      <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
+      <div class="grid-item" id="12"><div class="tile" id="tile-12"></div></div>
+      <div class="grid-item" id="17"><div class="tile" id="tile-17"></div></div>
+      <div class="grid-item" id="22"><div class="tile" id="tile-22"></div></div>
 
       <div class="grid-item" id="3"><div class="tile" id="tile-3"></div></div>
-      <div class="grid-item" id="7"><div class="tile" id="tile-7"></div></div>
-      <div class="grid-item" id="11"><div class="tile" id="tile-11"></div></div>
-      <div class="grid-item" id="15"><div class="tile" id="tile-15"></div></div>
+      <div class="grid-item" id="8"><div class="tile" id="tile-8"></div></div>
+      <div class="grid-item" id="13"><div class="tile" id="tile-13"></div></div>
+      <div class="grid-item" id="18"><div class="tile" id="tile-18"></div></div>
+      <div class="grid-item" id="23"><div class="tile" id="tile-23"></div></div>
+
+      <div class="grid-item" id="4"><div class="tile" id="tile-4"></div></div>
+      <div class="grid-item" id="9"><div class="tile" id="tile-9"></div></div>
+      <div class="grid-item" id="14"><div class="tile" id="tile-14"></div></div>
+      <div class="grid-item" id="19"><div class="tile" id="tile-19"></div></div>
+      <div class="grid-item" id="24"><div class="tile" id="tile-24"></div></div>
     `;
+    }
     contentDiv.append(newDiv);
   };
 
@@ -312,16 +368,16 @@ document.addEventListener('DOMContentLoaded', e => {
     } else {
       let userCompleted = false;
       fetch('http://localhost:3000/user_images')
-      .then(resp => resp.json())
-      .then(json => {
-        for (let userImage of json) {
-          if (userImage.user_id == userId && userImage.image_id == image.id && userImage.completed == true) {
-            userCompleted = true;
+        .then(resp => resp.json())
+        .then(json => {
+          for (let userImage of json) {
+            if (userImage.user_id == userId && userImage.image_id == image.id && userImage.completed == true) {
+              userCompleted = true;
+            }
           }
-        }
-        squareImg(image.id, image.img_url, image.category.name, 0, userCompleted)
-      })
-            
+          squareImg(image.id, image.img_url, image.category.name, 0, userCompleted)
+        })
+
     }
   }
 
@@ -336,16 +392,17 @@ document.addEventListener('DOMContentLoaded', e => {
     })
     document.addEventListener('click', e => {
       if (document.querySelector('.grid-container')) {
-        playPuzzle(e.target)
+        const gridSize = parseInt(document.querySelector('.grid-container').dataset.gridSize, 10);
+        playPuzzle(e.target, gridSize)
       }
       if (e.target.matches('.img-thumbnail')) {
         addPuzzleGrid()
         const imgId = e.target.dataset.imgId;
         const category = e.target.dataset.category
-       
-        
+
+
         renderSelectedImageAsPuzzle(imgId, category)
-        
+
         // gridContainer.style.pointerEvents = 'none'
 
       } else if (e.target.matches('.completed-puzzles')) {
@@ -359,6 +416,10 @@ document.addEventListener('DOMContentLoaded', e => {
         // movesCounter.hidden = false
         e.target.hidden = true;
         document.querySelector('#moves-container').hidden = false;
+        const sizeButtons = document.querySelectorAll('.btn-group');
+        for (let button of sizeButtons) {
+          button.disabled = true;
+        }
         scrambleTiles();
       } else if (e.target.matches('.create-puzzle')) {
         renderFormToCreateNewPuzzle(e.target)
@@ -367,6 +428,19 @@ document.addEventListener('DOMContentLoaded', e => {
       } else if (e.target.parentElement.parentElement.matches('#categorySubmenu')) {
         resetActiveNavBarElement(e.target)
         getImages(e.target.textContent)
+      } else if (e.target.parentElement.matches('.btn-group')) {
+        const sizeChoice = parseInt(e.target.firstElementChild.id.split('-')[1]);
+        const imageId = document.querySelector('.grid-container').dataset.imgId;
+        const category = document.querySelector('.grid-container').dataset.category;
+        clearContent();
+        addPuzzleGrid(sizeChoice);
+        renderSelectedImageAsPuzzle(imageId, category, sizeChoice);
+        // change the size of the grid (using cropImage)
+        // THEN, in the scramble clickhandler, put in a thing that checks for size
+        // if size is 4, great, render the usual (persisted) scramble
+        // otherwise, do the original scrambleTiles that moves stuff around
+        // ALSO, make sure the moveableTilePositions and emptyTilePosition functions
+        // know what to do with the other sizes
       }
     })
 
@@ -381,9 +455,9 @@ document.addEventListener('DOMContentLoaded', e => {
     })
   }
 
-  const playPuzzle = el => {
-    let emptyPosIndex = findEmptyTilePosition();
-    let moveablePositions = moveableTilePositions(emptyPosIndex);
+  const playPuzzle = (el, gridSize) => {
+    let emptyPosIndex = findEmptyTilePosition(gridSize);
+    let moveablePositions = moveableTilePositions(emptyPosIndex, gridSize);
 
     if (moveablePositions.includes(parseInt(el.parentElement.parentElement.id, 10))) {
       const movesCounter = document.querySelector('#moves-counter')
@@ -537,7 +611,7 @@ document.addEventListener('DOMContentLoaded', e => {
         fetch("http://localhost:3000/images", options)
           .then(response => response.json())
           .then(json => {
-              console.log(json)
+            console.log(json)
             addPuzzleGrid();
             renderSelectedImageAsPuzzle(json.id, json.category.name)
           })
@@ -561,10 +635,10 @@ document.addEventListener('DOMContentLoaded', e => {
     imageGrid.dataset.imgId = imgId
 
     imageGrid.dataset.category = category
-    if(!imageGrid.dataset.category.includes("my")){
-        const leaderboard = document.querySelector('.leaderboard-container')
-        renderLeaderboard(imgId);
-        leaderboard.hidden = false;
+    if (!imageGrid.dataset.category.includes("my")) {
+      const leaderboard = document.querySelector('.leaderboard-container')
+      renderLeaderboard(imgId);
+      leaderboard.hidden = false;
     }
 
     const userImagesObj = {
@@ -622,18 +696,18 @@ document.addEventListener('DOMContentLoaded', e => {
 
   };
 
-  const findEmptyTilePosition = () => {
-    return parseInt(document.getElementById('tile-15').parentElement.id, 10);
+  const findEmptyTilePosition = (gridSize) => {
+    const emptyNum = gridSize * gridSize - 1;
+    return parseInt(document.getElementById(`tile-${emptyNum}`).parentElement.id, 10);
   };
 
-  const moveableTilePositions = (emptyPosIndex) => {
+  const moveableTilePositions = (emptyPosIndex, rowSize) => {
     // above: -1, below: +1, left: -4, right: +4
     // if < 4, no left
     // if > 11, no right
     // if % 4 = 0, no above
     // if % 4 = 3, no below
-    const gridSize = 16; // for custom grid sizes, just pass grid size as param and the rest will work
-    const rowSize = Math.sqrt(gridSize);
+    const gridSize = rowSize * rowSize; // for custom grid sizes, just pass grid size as param and the rest will work
     const allowedPos = [];
     if (emptyPosIndex >= rowSize) {
       allowedPos.push(emptyPosIndex - rowSize);
@@ -651,8 +725,9 @@ document.addEventListener('DOMContentLoaded', e => {
   };
 
   const swapTiles = (tileToMove) => {
+    let gridSize = parseInt(document.querySelector('.grid-container').dataset.gridSize, 10);
     let posToPlace = tileToMove.parentElement;
-    let emptyPosIndex = findEmptyTilePosition();
+    let emptyPosIndex = findEmptyTilePosition(gridSize);
     let emptyTile = document.getElementById(`${emptyPosIndex}`).firstChild;
 
     emptyTile.remove();
@@ -750,10 +825,10 @@ document.addEventListener('DOMContentLoaded', e => {
         });
 
         const leaderboard = document.querySelector('#modal-tbody');
-        
+
         removeChildren(leaderboard)
         const imageGrid = document.querySelector('.grid-container')
-        if(!imageGrid.dataset.category.includes("my")){
+        if (!imageGrid.dataset.category.includes("my")) {
           leaderboard.parentElement.parentElement.parentElement.hidden = false;
           for (let i = 0; i < sortedResults.length; i++) {
             const row = document.createElement('tr');

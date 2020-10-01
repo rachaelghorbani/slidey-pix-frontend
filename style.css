@@ -103,11 +103,29 @@ ul ul a {
   align-items: center;
 }
 
-.grid-container {
+.grid-container.grid-size-4 {
   display: grid;
   width: 75vw;
   grid-template-columns: 20vh 20vh 20vh 20vh;
   grid-template-rows: 20vh 20vh 20vh 20vh;
+  padding: 10px;
+  justify-content: center;
+}
+
+.grid-container.grid-size-3 {
+  display: grid;
+  width: 75vw;
+  grid-template-columns: 27vh 27vh 27vh;
+  grid-template-rows: 27vh 27vh 27vh;
+  padding: 10px;
+  justify-content: center;
+}
+
+.grid-container.grid-size-5 {
+  display: grid;
+  width: 75vw;
+  grid-template-columns: 16vh 16vh 16vh 16vh 16vh;
+  grid-template-rows: 16vh 16vh 16vh 16vh 16vh;
   padding: 10px;
   justify-content: center;
 }
