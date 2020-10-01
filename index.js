@@ -448,7 +448,9 @@ document.addEventListener('DOMContentLoaded', e => {
 
     $('#exampleModal').on('hide.bs.modal', e => {
       const imgId = parseInt(document.querySelector('.grid-container').dataset.imgId, 10);
-      renderLeaderboard(imgId);
+      if (document.querySelector('.grid-container').getAttribute('data-grid-size') == 4) {
+        renderLeaderboard(imgId);
+      }
       const imageGrid = document.querySelector('.grid-container')
       //    imageGrid.style.pointerEvents = 'none'
 
@@ -463,7 +465,7 @@ document.addEventListener('DOMContentLoaded', e => {
       const movesCounter = document.querySelector('#moves-counter')
       movesCounter.textContent = parseInt(movesCounter.textContent, 10) + 1;
       swapTiles(el.parentElement);
-      isSolved()
+      isSolved(gridSize)
     }
   }
 
@@ -635,7 +637,7 @@ document.addEventListener('DOMContentLoaded', e => {
     imageGrid.dataset.imgId = imgId
 
     imageGrid.dataset.category = category
-    if (!imageGrid.dataset.category.includes("my")) {
+    if (!imageGrid.dataset.category.includes("my") && gridSize == 4) {
       const leaderboard = document.querySelector('.leaderboard-container')
       renderLeaderboard(imgId);
       leaderboard.hidden = false;
@@ -764,7 +766,7 @@ document.addEventListener('DOMContentLoaded', e => {
     // }
   };
 
-  const isSolved = () => {
+  const isSolved = (gridSize) => {
     const gridItems = document.querySelectorAll('.grid-item');
     let flag = true;
     for (let position of gridItems) {
@@ -794,17 +796,16 @@ document.addEventListener('DOMContentLoaded', e => {
             }
             fetch(`http://localhost:3000/user_images/${userImageId}`, options)
               .then(response => response.json())
-              .then(json => endOfGame());
+              .then(json => endOfGame(gridSize));
           } else {
-            endOfGame();
+            endOfGame(gridSize);
           }
         });
     }
   }
 
-  const endOfGame = () => {
+  const endOfGame = (gridSize) => {
     const imgId = document.querySelector('.grid-container').dataset.imgId;
-    const gridSize = document.querySelector('.grid-container').dataset.gridSize;
 
     fetch('http://localhost:3000/user_images')
       .then(response => response.json())
@@ -828,7 +829,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
         removeChildren(leaderboard)
         const imageGrid = document.querySelector('.grid-container')
-        if (!imageGrid.dataset.category.includes("my")) {
+        if (!imageGrid.dataset.category.includes("my") && gridSize == 4) {
           leaderboard.parentElement.parentElement.parentElement.hidden = false;
           for (let i = 0; i < sortedResults.length; i++) {
             const row = document.createElement('tr');
@@ -857,7 +858,7 @@ document.addEventListener('DOMContentLoaded', e => {
       .then(json => {
         const results = [];
         for (let userImage of json) {
-          if (userImage.image_id == imgId && userImage.completed == true) {
+          if (userImage.image_id == imgId && userImage.completed == true && userImage.grid_size == 4) {
             results.push({
               "username": userImage.user.username,
               "moves": userImage.moves
