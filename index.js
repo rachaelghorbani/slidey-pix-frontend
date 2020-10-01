@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', e => {
         origCanvas.width = w - (origToCrop * 2);
 
         // draw image with params: imgobj, sx, sy, swidth, sheight
-        origCtx.drawImage(sqrImgObj, -origToCrop, 0, w - origToCrop, h);
+        origCtx.drawImage(sqrImgObj, -origToCrop, 0, w, h);
       } else {
         const w = window.innerHeight;
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', e => {
         const origToCrop = (ratio * difference) / 2;
         origCanvas.height = h - (origToCrop * 2);
 
-        origCtx.drawImage(sqrImgObj, 0, -origToCrop, w, h - origToCrop);
+        origCtx.drawImage(sqrImgObj, 0, -origToCrop, w, h);
       }
       // now we make the Image object for the chopping we're about to do
       const imgObj = new Image();
@@ -735,19 +735,21 @@ document.addEventListener('DOMContentLoaded', e => {
         const leaderboard = document.querySelector('#modal-tbody');
         
         removeChildren(leaderboard)
-        // const imageGrid = document.querySelector('.grid-container')
-        // if(!imageGrid.dataset.category.includes("my")){
-
-        for (let i = 0; i < sortedResults.length; i++) {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-          <th scope="row">${i + 1}</th>
-          <td>${sortedResults[i].username}</td>              
-          <td>${sortedResults[i].moves}</td>
-        `;
-          leaderboard.append(row);
+        const imageGrid = document.querySelector('.grid-container')
+        if(!imageGrid.dataset.category.includes("my")){
+          leaderboard.parentElement.parentElement.parentElement.hidden = false;
+          for (let i = 0; i < sortedResults.length; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <th scope="row">${i + 1}</th>
+            <td>${sortedResults[i].username}</td>              
+            <td>${sortedResults[i].moves}</td>
+          `;
+            leaderboard.append(row);
+          }
+        } else {
+          leaderboard.parentElement.parentElement.parentElement.hidden = true;
         }
-        // }
       })
 
     const modalButton = document.querySelector('#show-modal');
