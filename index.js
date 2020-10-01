@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', e => {
       }
     }
   }
+  
 
   const addPuzzleGrid = (gridSize = 4) => {
     clearContent();
