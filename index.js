@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', e => {
             const heightOfOnePiece = nh / gridSize;
             const widthOfOnePiece = heightOfOnePiece;
 
-            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width - 2, canvas.height - 2);
+            ctx.drawImage(imgObj, x * widthOfOnePiece, y * heightOfOnePiece, widthOfOnePiece, heightOfOnePiece, 0, 0, canvas.width - 1, canvas.height - 1);
 
             // every new canvas gets pushed to the imagePieces array as a new element
             imagePieces.push(canvas.toDataURL());
@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
 
         renderSelectedImageAsPuzzle(imgId, category)
-
+        // const gridContainer = document.querySelector('.grid-container')
         // gridContainer.style.pointerEvents = 'none'
 
       } else if (e.target.matches('.completed-puzzles')) {
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', e => {
         getImages();
       } else if (e.target.matches('#scramble')) {
         const imageGrid = document.querySelector('.grid-container')
-        // imageGrid.style.pointerEvents = 'auto'
+        imageGrid.style.pointerEvents = 'auto'
         // movesCounter.hidden = false
         e.target.hidden = true;
         document.querySelector('#moves-container').hidden = false;
@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', e => {
         renderLeaderboard(imgId);
       }
       const imageGrid = document.querySelector('.grid-container')
-      //    imageGrid.style.pointerEvents = 'none'
+         imageGrid.style.pointerEvents = 'none'
 
     })
   }
@@ -636,6 +636,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
     const imageGrid = document.querySelector('.grid-container')
     imageGrid.dataset.imgId = imgId
+    imageGrid.style.pointerEvents = 'none'
+    imageGrid.classList.add('fade-in')
 
     imageGrid.dataset.category = category
     const leaderboard = document.querySelector('.leaderboard-container')

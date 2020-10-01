@@ -209,3 +209,29 @@ ul ul a {
 .em {
   font-style: italic;
 }
+
+
+ @-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+.fade-in {
+	-webkit-animation: fade-in 1.5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+          animation: fade-in 1.5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+          animation-delay: 0.3s;
+}
+
