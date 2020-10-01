@@ -148,6 +148,12 @@ ul ul a {
 
 .color-rose {
   background: #ff5d73;
+  border-color: #8f0043;
+}
+
+.btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show>.btn-secondary.dropdown-toggle {
+  background: #ff334e;
+  border-color: #8f0043;
 }
 
 .color-rose:hover {
@@ -167,7 +173,13 @@ ul ul a {
 }
 
 .border-none {
-    border: none;
+  border: none;
 }
 
+.w-66 {
+  width: 66%!important;
+}
 
+#moves-container {
+  margin-bottom: 0;
+}

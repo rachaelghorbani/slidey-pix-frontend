@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', e => {
     }
   };
 
-  const cropImage = (imgUrl) => {
+  const cropImage = (imgUrl, gridSize) => {
 
     // take original image and make it square:
 
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', e => {
     el.parentElement.classList.add('active');
   };
 
-  const renderSelectedImageAsPuzzle = (imgId, category) => {
+  const renderSelectedImageAsPuzzle = (imgId, category, gridSize = 4) => {
 
 
     const imageGrid = document.querySelector('.grid-container')
@@ -569,7 +569,8 @@ document.addEventListener('DOMContentLoaded', e => {
 
     const userImagesObj = {
       user_id: userId,
-      image_id: imgId
+      image_id: imgId,
+      grid_size: gridSize
     };
 
     const options = {
@@ -582,27 +583,42 @@ document.addEventListener('DOMContentLoaded', e => {
       .then(response => response.json())
       .then(json => {
         scramblePos = json.image.scramble_pos
-        renderPuzzle(json.id, json.image.img_url);
+        renderPuzzle(json.id, json.image.img_url, gridSize);
 
       })
 
   }
 
 
-  const renderPuzzle = (userImageId, puzzleUrl) => {
+  const renderPuzzle = (userImageId, puzzleUrl, gridSize) => {
     const newDiv = document.createElement('div');
     newDiv.id = 'game-info'
+    newDiv.className = "d-flex flex-row"
     newDiv.innerHTML = `
-      <button id="scramble" class="btn btn-info color-rose border-none">Scramble!</button>
+      <div class="d-flex w-50 justify-content-between">
       <p id="moves-container" class="text-center text-blue">Moves: <span id="moves-counter">0</span></p>
+      <button id="scramble" class="btn btn-sm btn-info color-rose border-none">Scramble!</button>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-secondary btn-sm color-rose">
+              <input type="radio" name="options" id="grid-3" autocomplete="off"> 3x3 Grid
+          </label>
+          <label class="btn btn-secondary btn-sm color-rose active">
+              <input type="radio" name="options" id="grid-4" autocomplete="off" checked> 4x4 Grid
+          </label>
+          <label class="btn btn-secondary btn-sm color-rose">
+              <input type="radio" name="options" id="grid-5" autocomplete="off"> 5x5 Grid
+          </label>
+      </div>
+      </div>
     `;
-    newDiv.lastElementChild.hidden = true;
+    newDiv.firstElementChild.firstElementChild.hidden = true;
     const gridContainer = document.querySelector('.grid-container');
 
     contentDiv.insertBefore(newDiv, gridContainer);
     gridContainer.dataset.userImageId = userImageId;
+    gridContainer.dataset.gridSize = gridSize;
 
-    cropImage(puzzleUrl)
+    cropImage(puzzleUrl, gridSize)
 
   };
 
@@ -713,6 +729,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
   const endOfGame = () => {
     const imgId = document.querySelector('.grid-container').dataset.imgId;
+    const gridSize = document.querySelector('.grid-container').dataset.gridSize;
 
     fetch('http://localhost:3000/user_images')
       .then(response => response.json())
@@ -720,7 +737,7 @@ document.addEventListener('DOMContentLoaded', e => {
         const results = [];
 
         for (let userImage of json) {
-          if (userImage.image_id == imgId && userImage.completed == true) {
+          if (userImage.image_id == imgId && userImage.completed == true && userImage.grid_size == gridSize) {
             results.push({
               "username": userImage.user.username,
               "moves": userImage.moves
