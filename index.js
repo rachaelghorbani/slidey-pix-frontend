@@ -420,7 +420,8 @@ document.addEventListener('DOMContentLoaded', e => {
         for (let button of sizeButtons) {
           button.disabled = true;
         }
-        scrambleTiles();
+        const gridSize = parseInt(imageGrid.getAttribute('data-grid-size'), 10);
+        scrambleTiles(gridSize);
       } else if (e.target.matches('.create-puzzle')) {
         renderFormToCreateNewPuzzle(e.target)
       } else if (e.target.matches('.logout')) {
@@ -678,8 +679,8 @@ document.addEventListener('DOMContentLoaded', e => {
           <label class="btn btn-secondary btn-sm color-rose">
               <input type="radio" name="options" id="grid-3" autocomplete="off"> 3x3 Grid
           </label>
-          <label class="btn btn-secondary btn-sm color-rose active">
-              <input type="radio" name="options" id="grid-4" autocomplete="off" checked> 4x4 Grid
+          <label class="btn btn-secondary btn-sm color-rose">
+              <input type="radio" name="options" id="grid-4" autocomplete="off"> 4x4 Grid
           </label>
           <label class="btn btn-secondary btn-sm color-rose">
               <input type="radio" name="options" id="grid-5" autocomplete="off"> 5x5 Grid
@@ -687,6 +688,9 @@ document.addEventListener('DOMContentLoaded', e => {
       </div>
       </div>
     `;
+    const activeButton = newDiv.querySelector(`#grid-${gridSize}`)
+    activeButton.checked = true;
+    activeButton.parentElement.classList.add('active');
     newDiv.firstElementChild.firstElementChild.hidden = true;
     const gridContainer = document.querySelector('.grid-container');
 
@@ -739,31 +743,33 @@ document.addEventListener('DOMContentLoaded', e => {
     posToPlace.append(emptyTile);
   };
 
-  const scrambleTiles = () => {
-    let imagePieces = [];
-    for (let piece of document.querySelectorAll('img')) {
-      imagePieces[parseInt(piece.parentElement.id.split("-")[1], 10)] = piece;
-      imagePieces[15] = ''
+  const scrambleTiles = (gridSize) => {
+    if (gridSize == 4) {
+      let imagePieces = [];
+      for (let piece of document.querySelectorAll('img')) {
+        imagePieces[parseInt(piece.parentElement.id.split("-")[1], 10)] = piece;
+        imagePieces[15] = ''
+      }
+
+      for (let position in scramblePos) {
+        const positionDiv = document.getElementById(`${position}`);
+        removeChildren(positionDiv);
+        const tile = document.createElement(`div`);
+        tile.className = 'tile';
+        tile.id = `tile-${scramblePos[position]}`;
+        tile.append(imagePieces[scramblePos[position]]);
+        positionDiv.append(tile)
+      }
+    } else {
+      for (let i = 0; i < 100; i++) {
+        let emptyPosIndex = findEmptyTilePosition(gridSize);
+        let moveablePositions = moveableTilePositions(emptyPosIndex, gridSize);
+        let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
+        let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstElementChild;
+        swapTiles(tileToMove);
+      }
     }
 
-    for (let position in scramblePos) {
-      const positionDiv = document.getElementById(`${position}`);
-      removeChildren(positionDiv);
-      const tile = document.createElement(`div`);
-      tile.className = 'tile';
-      tile.id = `tile-${scramblePos[position]}`;
-      tile.append(imagePieces[scramblePos[position]]);
-      positionDiv.append(tile)
-    }
-
-    // for (let i = 0; i < 100; i++) {
-    //   let emptyPosIndex = findEmptyTilePosition();
-    //   let moveablePositions = moveableTilePositions(emptyPosIndex);
-    //   let positionToMoveIndex = Math.floor(Math.random() * moveablePositions.length);
-    //   let tileToMove = document.getElementById(`${moveablePositions[positionToMoveIndex]}`).firstChild;
-
-    //   swapTiles(tileToMove);
-    // }
   };
 
   const isSolved = (gridSize) => {
