@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', e => {
   }
   let scramblePos = {}
 
-  const squareImg = (id, img_url, moves, completed) => {
+  const squareImg = (id, img_url, category, moves, completed) => {
     const origCanvas = document.createElement('canvas');
     const origCtx = origCanvas.getContext('2d');
     // create the Image object we'll be using the canvas methods on
@@ -62,14 +62,14 @@ document.addEventListener('DOMContentLoaded', e => {
       if (completed === true) {
         newDiv.innerHTML = `
           <a href="#" class="d-block mb-4 h-100">
-            <img class="img-fluid img-thumbnail" style="opacity: 0.5;" data-img-id=${id} src=${origCanvas.toDataURL()}>
+            <img data-category=${category} class="img-fluid img-thumbnail" style="opacity: 0.5;" data-img-id=${id} src=${origCanvas.toDataURL()}>
             <p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">completed</p>
           </a>
         `;
       } else {
         newDiv.innerHTML = `
           <a href="#" class="d-block mb-4 h-100">
-            <img class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
+            <img data-category=${category} class="img-fluid img-thumbnail" data-img-id=${id} src=${origCanvas.toDataURL()}>
           </a>
         `;
       }
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', e => {
       }
     }
     if (flag === false) {
-      squareImg(image.id, image.img_url);
+      squareImg(image.id, image.img_url, image.category.name);
     } else {
       let userCompleted = false;
       fetch('http://localhost:3000/user_images')
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', e => {
             userCompleted = true;
           }
         }
-        squareImg(image.id, image.img_url, 0, userCompleted)
+        squareImg(image.id, image.img_url, image.category.name, 0, userCompleted)
       })
             
     }
@@ -341,8 +341,11 @@ document.addEventListener('DOMContentLoaded', e => {
       if (e.target.matches('.img-thumbnail')) {
         addPuzzleGrid()
         const imgId = e.target.dataset.imgId;
-        renderSelectedImageAsPuzzle(imgId)
-        const gridContainer = document.querySelector('.grid-container')
+        const category = e.target.dataset.category
+       
+        
+        renderSelectedImageAsPuzzle(imgId, category)
+        
         // gridContainer.style.pointerEvents = 'none'
 
       } else if (e.target.matches('.completed-puzzles')) {
@@ -477,12 +480,13 @@ document.addEventListener('DOMContentLoaded', e => {
           for (let image of user.images) {
             if (image.id === puzzleHash.image_id) {
               puzzleHash.img_url = image.img_url
+              puzzleHash.category = image.category.name
               solvedPuzzles.push(puzzleHash)
             }
           }
         }
         for (let puzzle of solvedPuzzles) {
-          squareImg(puzzle.image_id, puzzle.img_url, puzzle.moves)
+          squareImg(puzzle.image_id, puzzle.img_url, puzzle.category, puzzle.moves)
         }
       })
   }
@@ -521,7 +525,8 @@ document.addEventListener('DOMContentLoaded', e => {
         const imgObj = {
           img_url: form.img_url.value,
           user_id: userId,
-          category_id: categoryId
+          category_id: categoryId,
+          scramble_pos: this.scrambler
         }
 
         const options = {
@@ -534,7 +539,7 @@ document.addEventListener('DOMContentLoaded', e => {
           .then(response => response.json())
           .then(json => {
             addPuzzleGrid();
-            renderSelectedImageAsPuzzle(json.id)
+            renderSelectedImageAsPuzzle(json.id, json.category.name)
           })
       })
   }
@@ -549,14 +554,18 @@ document.addEventListener('DOMContentLoaded', e => {
     el.parentElement.classList.add('active');
   };
 
-  const renderSelectedImageAsPuzzle = imgId => {
+  const renderSelectedImageAsPuzzle = (imgId, category) => {
 
 
     const imageGrid = document.querySelector('.grid-container')
     imageGrid.dataset.imgId = imgId
-    const leaderboard = document.querySelector('.leaderboard-container')
-    renderLeaderboard(imgId);
-    leaderboard.hidden = false;
+
+    imageGrid.dataset.category = category
+    if(!imageGrid.dataset.category.includes("my")){
+        const leaderboard = document.querySelector('.leaderboard-container')
+        renderLeaderboard(imgId);
+        leaderboard.hidden = false;
+    }
 
     const userImagesObj = {
       user_id: userId,
@@ -724,7 +733,10 @@ document.addEventListener('DOMContentLoaded', e => {
         });
 
         const leaderboard = document.querySelector('#modal-tbody');
+        
         removeChildren(leaderboard)
+        // const imageGrid = document.querySelector('.grid-container')
+        // if(!imageGrid.dataset.category.includes("my")){
 
         for (let i = 0; i < sortedResults.length; i++) {
           const row = document.createElement('tr');
@@ -735,6 +747,7 @@ document.addEventListener('DOMContentLoaded', e => {
         `;
           leaderboard.append(row);
         }
+        // }
       })
 
     const modalButton = document.querySelector('#show-modal');
