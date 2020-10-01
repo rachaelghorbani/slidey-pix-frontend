@@ -526,7 +526,6 @@ document.addEventListener('DOMContentLoaded', e => {
           img_url: form.img_url.value,
           user_id: userId,
           category_id: categoryId,
-        //   scramble_pos: this.scrambler
         }
 
         const options = {
@@ -538,6 +537,7 @@ document.addEventListener('DOMContentLoaded', e => {
         fetch("http://localhost:3000/images", options)
           .then(response => response.json())
           .then(json => {
+              console.log(json)
             addPuzzleGrid();
             renderSelectedImageAsPuzzle(json.id, json.category.name)
           })
