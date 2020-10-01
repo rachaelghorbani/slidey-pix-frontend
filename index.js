@@ -638,10 +638,39 @@ document.addEventListener('DOMContentLoaded', e => {
     imageGrid.dataset.imgId = imgId
 
     imageGrid.dataset.category = category
+    const leaderboard = document.querySelector('.leaderboard-container')
+
     if (!imageGrid.dataset.category.includes("my") && gridSize == 4) {
-      const leaderboard = document.querySelector('.leaderboard-container')
+      if (leaderboard.querySelector('p')) {
+        leaderboard.querySelector('p').remove();
+      }
       renderLeaderboard(imgId);
       leaderboard.hidden = false;
+      leaderboard.querySelector('table').hidden = false;
+    } else if (imageGrid.dataset.category.includes("my")) {
+      if (leaderboard.querySelector('p')) {
+        leaderboard.querySelector('p').remove();
+      }
+      leaderboard.hidden = false;
+      const newP = document.createElement('p');
+      newP.className = 'pad-left small em';
+      newP.innerHTML = `
+        Sorry, no leaderboard is available for custom puzzles.
+      `;
+      leaderboard.querySelector('table').hidden = true;
+      leaderboard.append(newP);
+    } else if (gridSize != 4) {
+      if (leaderboard.querySelector('p')) {
+        leaderboard.querySelector('p').remove();
+      }
+      leaderboard.hidden = false;
+      const newP = document.createElement('p');
+      newP.className = 'pad-left small em';
+      newP.innerHTML = `
+        Sorry, no leaderboard is available for custom grid sizes.
+      `;
+      leaderboard.querySelector('table').hidden = true;
+      leaderboard.append(newP);
     }
 
     const userImagesObj = {

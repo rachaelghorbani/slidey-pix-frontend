@@ -201,3 +201,11 @@ ul ul a {
 #moves-container {
   margin-bottom: 0;
 }
+
+.pad-left {
+  padding-left: 20px;
+}
+
+.em {
+  font-style: italic;
+}
