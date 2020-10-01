@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', e => {
           img_url: form.img_url.value,
           user_id: userId,
           category_id: categoryId,
-          scramble_pos: this.scrambler
+        //   scramble_pos: this.scrambler
         }
 
         const options = {
