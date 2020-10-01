@@ -789,6 +789,7 @@ document.addEventListener('DOMContentLoaded', e => {
         tile.append(imagePieces[scramblePos[position]]);
         positionDiv.append(tile)
       }
+      returnGrid(scramblePos)
     } else {
       for (let i = 0; i < 100; i++) {
         let emptyPosIndex = findEmptyTilePosition(gridSize);
@@ -915,6 +916,49 @@ document.addEventListener('DOMContentLoaded', e => {
         }
       });
   };
+
+  const returnGrid = () => {
+    // 0: 8
+    // 1: 0
+    // 2: 2
+    // 3: 1
+    // 4: 4
+    // 5: 15
+    // 6: 5
+    // 7: 3
+    // 8: 9
+    // 9: 13
+    // 10: 7
+    // 11: 11
+    // 12: 12
+    // 13: 10
+    // 14: 6
+    // 15: 14
+    for (let position in scramblePos) {
+      if (scramblePos[position] == 15) {
+        scramblePos[position] = 0;
+      } else {
+        scramblePos[position]++;
+      }
+    }
+    // 0 4 8  12
+    // 1 5 9  13
+    // 2 6 10 14
+    // 3 7 11 15
+    // 
+    // 0  1  2  3
+    // 4  5  6  7
+    // 8  9  10 11
+    // 12 13 14 15
+    const grid = {
+      0: [scramblePos[0], scramblePos[4], scramblePos[8], scramblePos[12]], 
+      1: [scramblePos[1], scramblePos[5], scramblePos[9], scramblePos[13]], 
+      2: [scramblePos[2], scramblePos[6], scramblePos[10], scramblePos[14]], 
+      3: [scramblePos[3], scramblePos[7], scramblePos[11], scramblePos[15]]
+    }
+    console.log(grid)
+    return grid;
+  }
 
   clickHandler();
 });
