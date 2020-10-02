@@ -235,3 +235,6 @@ ul ul a {
           animation-delay: 0.3s;
 }
 
+ul {
+  list-style-type: none;
+}

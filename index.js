@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', e => {
   }
   let scramblePos = {}
 
-  const squareImg = (id, img_url, category, moves, completed) => {
+  const squareImg = (id, img_url, category, moves, completed, gridSize) => {
     const origCanvas = document.createElement('canvas');
     const origCtx = origCanvas.getContext('2d');
     // create the Image object we'll be using the canvas methods on
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', e => {
       newDiv.class = "col-lg-3 col-md-4 col-6";
       newDiv.style = "position: relative; text-align: center; color: white;"
 
-      if (completed === true) {
+      if (completed === true && document.querySelector('h1').textContent !== "Completed Puzzles") {
         newDiv.innerHTML = `
           <a href="#" class="d-block mb-4 h-100">
             <img data-category=${category} class="img-fluid img-thumbnail" style="opacity: 0.5;" data-img-id=${id} src=${origCanvas.toDataURL()}>
@@ -74,15 +74,36 @@ document.addEventListener('DOMContentLoaded', e => {
         `;
       }
 
-      document.querySelector('#thumbnails').append(newDiv);
+      
       if (document.querySelector('h1').textContent === "Completed Puzzles") {
-        const thumbDiv = document.querySelector('#thumbnails').lastElementChild;
-        const movesP = document.createElement('p');
-        movesP.className = 'text-blue text-center';
-        movesP.textContent = `Completed in ${moves} moves!`;
-        thumbDiv.firstElementChild.append(movesP);
+        let imgThumbnail = document.querySelector(`[data-img-id='${id}']`);
+        
+        if (!imgThumbnail) {
+          document.querySelector('#thumbnails').append(newDiv);
+          const newMovesUl = document.createElement('ul');
+          newMovesUl.className = 'text-blue text-center';
+          imgThumbnail = document.querySelector(`[data-img-id='${id}']`);
+          imgThumbnail.parentElement.append(newMovesUl);
+        }
+        imgThumbnail = document.querySelector(`[data-img-id='${id}']`);
+        const movesUl = imgThumbnail.parentElement.querySelector('ul');
+        const newLi = document.createElement('li');
+        newLi.className = "mr-4";
+        newLi.id = `grid-size-${gridSize}`;
+        newLi.textContent = `Completed ${gridSize}x${gridSize} in ${moves} moves!`;
+        const nextSizeUp = movesUl.querySelector(`#grid-size-${gridSize+1}`);
+        const twoSizesUp = movesUl.querySelector(`#grid-size-${gridSize+1}`);
+        if (nextSizeUp) {
+          nextSizeUp.parentNode.insertBefore(newLi, nextSizeUp);
+        } else if (twoSizesUp) {
+          twoSizesUp.parentNode.insertBefore(newLi, twoSizesUp);
+        } else {
+          movesUl.append(newLi);
+        }
+      } else {
+        document.querySelector('#thumbnails').append(newDiv);
       }
-    }
+    } 
   };
 
   const cropImage = (imgUrl, gridSize) => {
@@ -548,6 +569,7 @@ document.addEventListener('DOMContentLoaded', e => {
           if (userImage.completed === true) {
             const puzzleIdAndMoves = {}
             puzzleIdAndMoves.image_id = userImage.image_id
+            puzzleIdAndMoves.grid_size = userImage.grid_size
             puzzleIdAndMoves.moves = userImage.moves
             solvedPuzzleMovesAndId.push(puzzleIdAndMoves)
           }
@@ -556,14 +578,16 @@ document.addEventListener('DOMContentLoaded', e => {
         for (let puzzleHash of solvedPuzzleMovesAndId) {
           for (let image of user.images) {
             if (image.id === puzzleHash.image_id) {
-              puzzleHash.img_url = image.img_url
-              puzzleHash.category = image.category.name
-              solvedPuzzles.push(puzzleHash)
+              if (typeof puzzleHash.img_url === 'undefined') {
+                puzzleHash.img_url = image.img_url
+                puzzleHash.category = image.category.name
+                solvedPuzzles.push(puzzleHash)
+              }
             }
           }
         }
         for (let puzzle of solvedPuzzles) {
-          squareImg(puzzle.image_id, puzzle.img_url, puzzle.category, puzzle.moves)
+          squareImg(puzzle.image_id, puzzle.img_url, puzzle.category, puzzle.moves, true, parseInt(puzzle.grid_size, 10))
         }
       })
   }
@@ -650,6 +674,7 @@ document.addEventListener('DOMContentLoaded', e => {
       leaderboard.hidden = false;
       leaderboard.querySelector('table').hidden = false;
     } else if (imageGrid.dataset.category.includes("my")) {
+      leaderboard.querySelector('table').hidden = true;
       if (leaderboard.querySelector('p')) {
         leaderboard.querySelector('p').remove();
       }
@@ -659,9 +684,9 @@ document.addEventListener('DOMContentLoaded', e => {
       newP.innerHTML = `
         Sorry, no leaderboard is available for custom puzzles.
       `;
-      leaderboard.querySelector('table').hidden = true;
       leaderboard.append(newP);
     } else if (gridSize != 4) {
+      leaderboard.querySelector('table').hidden = true;
       if (leaderboard.querySelector('p')) {
         leaderboard.querySelector('p').remove();
       }
@@ -671,7 +696,6 @@ document.addEventListener('DOMContentLoaded', e => {
       newP.innerHTML = `
         Sorry, no leaderboard is available for custom grid sizes.
       `;
-      leaderboard.querySelector('table').hidden = true;
       leaderboard.append(newP);
     }
 
@@ -847,6 +871,8 @@ document.addEventListener('DOMContentLoaded', e => {
     fetch('http://localhost:3000/user_images')
       .then(response => response.json())
       .then(json => {
+        const leaderboard = document.querySelector('#modal-tbody');
+        
         const results = [];
 
         for (let userImage of json) {
@@ -862,27 +888,27 @@ document.addEventListener('DOMContentLoaded', e => {
           return (a.moves > b.moves) ? 1 : -1;
         });
 
-        const leaderboard = document.querySelector('#modal-tbody');
-
+        
         removeChildren(leaderboard)
         const imageGrid = document.querySelector('.grid-container')
+        
         if (!imageGrid.dataset.category.includes("my") && gridSize == 4) {
           leaderboard.parentElement.parentElement.parentElement.hidden = false;
           for (let i = 0; i < sortedResults.length; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
             <th scope="row">${i + 1}</th>
-            <td>${sortedResults[i].username}</td>              
+            <td class="small">${sortedResults[i].username}</td>              
             <td>${sortedResults[i].moves}</td>
           `;
             leaderboard.append(row);
           }
-        } else {
-          leaderboard.parentElement.parentElement.parentElement.hidden = true;
         }
       })
 
     const modalButton = document.querySelector('#show-modal');
+    const leaderboard = document.querySelector('#modal-tbody');
+    leaderboard.parentElement.parentElement.parentElement.hidden = true;
     modalButton.click();
   }
 
@@ -910,7 +936,7 @@ document.addEventListener('DOMContentLoaded', e => {
           const row = document.createElement('tr');
           row.innerHTML = `
           <th scope="row">${i + 1}</th>
-          <td>${sortedResults[i].username}</td>              
+          <td class="small">${sortedResults[i].username}</td>              
           <td>${sortedResults[i].moves}</td>
         `;
           leaderboard.append(row);
