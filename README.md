@@ -14,8 +14,8 @@ A user can:
 * see a list of all available puzzles
 * select a puzzle by category
 * create a new puzzle from an image of their own
-* can select a 3x3, 4x4, or 5x5, puzzle grid size to play from
-* can view their completed puzzles and the number of moves it took them for each grid size completed
+* select a 3x3, 4x4, or 5x5, puzzle grid size to play from
+* view their completed puzzles and the number of moves it took them for each grid size completed
 
 ## Dev Tools
 
