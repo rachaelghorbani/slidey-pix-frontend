@@ -22,6 +22,7 @@ A user can:
 **Front End**
 * Vanilla Javascript
 * HTML Canvas
+* Bootstrap
 
 [**Back End**](https://github.com/rachaelghorbani/slidey-pix-backend)
 * Ruby on Rails
